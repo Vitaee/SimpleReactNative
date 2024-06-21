@@ -2,8 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
-const LOCALHOST = Platform.OS === 'ios' ? 'https://canilgu.dev/makyaj-api' : 'https://canilgu.dev/makyaj-api';
-const API_BASE_URL = LOCALHOST + '/api/v1/';
+const API_BASE_URL = Platform.OS === 'ios' ? 'https://canilgu.dev/makyaj-api' : 'https://canilgu.dev/makyaj-api';
 
 const api = axios.create({
   baseURL: API_BASE_URL, // API base URL

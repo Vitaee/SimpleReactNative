@@ -1,6 +1,5 @@
-// src/screens/SplashScreen.tsx
 import React from 'react';
-import { View, Image, StyleSheet, Button } from 'react-native';
+import { View, Image, StyleSheet, Pressable, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 
 const SplashScreen: React.FC = () => {
@@ -16,10 +15,23 @@ const SplashScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../../assets/images/splash.png')} style={styles.image} />
-      <View style={styles.buttonContainer}>
-        <Button title="Log In" onPress={navigateToLogin} />
-        <Button title="Register" onPress={navigateToRegister} />
+      <Image
+        source={require('../../assets/images/icon.png')}
+        style={styles.backgroundImage}
+      />
+      <View style={styles.contentContainer}>
+        <Image
+          source={require('../../assets/images/partial-react-logo.png')}
+          style={styles.image}
+        />
+        <View style={styles.buttonContainer}>
+          <Pressable style={[styles.button, styles.loginButton]} onPress={navigateToLogin}>
+            <Text style={styles.buttonText}>Log In</Text>
+          </Pressable>
+          <Pressable style={[styles.button, styles.registerButton]} onPress={navigateToRegister}>
+            <Text style={styles.buttonText}>Register</Text>
+          </Pressable>
+        </View>
       </View>
     </View>
   );
@@ -28,19 +40,48 @@ const SplashScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  contentContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    padding: 30,
+    borderRadius: 20,
   },
   image: {
-    width: '80%',
-    height: '50%',
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '80%',
+    width: '100%',
     marginTop: 20,
+  },
+  button: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginHorizontal: 10,
+  },
+  loginButton: {
+    backgroundColor: '#6200EE',
+  },
+  registerButton: {
+    backgroundColor: '#6200EE',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

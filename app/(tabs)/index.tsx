@@ -1,10 +1,8 @@
 // app/(tabs)/index.tsx
 import React, { useEffect } from 'react';
 import { useRouter } from 'expo-router';
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { useAuth } from '../../src/context/AuthContext';
-import { View, Text, StyleSheet } from 'react-native';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 
 export default function HomeScreen() {
   const { token, appIsReady } = useAuth();
@@ -13,22 +11,23 @@ export default function HomeScreen() {
   useEffect(() => {
     if (appIsReady) {
       if (!token) {
-        router.replace('/login');
+        router.replace('/splash');
+      } else {
+        router.replace('/home');
       }
     }
   }, [token, appIsReady, router]);
 
   if (!appIsReady) {
     // Show a loading screen or nothing while checking auth status
-    return null;
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
   }
 
-  return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title">Welcome!</ThemedText>
-      <Text>Authenticated Home Screen Content</Text>
-    </ThemedView>
-  );
+  return null;
 }
 
 const styles = StyleSheet.create({
