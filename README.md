@@ -35,6 +35,16 @@ npm run reset-project
 
 This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
+## Screenshots
+A sample screenshots of project below.
+
+### Splash, Login, Register
+<img src ="https://github.com/Vitaee/SimpleReactNative/assets/45064650/0959d5b5-7734-434c-a026-3d23d98ca8c9"  width="300" height="680" />
+<img src ="https://github.com/Vitaee/SimpleReactNative/assets/45064650/8cffc506-6a95-4908-b35b-a7adcd69b23c"  width="300" height="680" />
+<img src ="https://github.com/Vitaee/SimpleReactNative/assets/45064650/f70f6cd7-c6b4-491c-b75f-1529cda4b993"  width="300" height="680" />
+
+
+
 ## Learn more
 
 To learn more about developing your project with Expo, look at the following resources:
