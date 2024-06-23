@@ -1,8 +1,7 @@
-// src/context/AuthContext.tsx
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import api from '../services/api';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { router } from 'expo-router';
+import  api  from '../services/api'; // Ensure to import your api instance
+import { useRouter } from 'expo-router';
 
 interface AuthContextData {
   token: string | null;
@@ -18,6 +17,7 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [appIsReady, setAppIsReady] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     async function prepare() {
@@ -35,60 +35,70 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const response = await api.get('/auth', {
           headers: { Authorization: `Bearer ${storedToken}` },
         });
+
         if (response.data.user) {
           setToken(storedToken);
-          return router.replace('/home');
-
+          router.replace('/home');
         } else {
           setToken(null);
           await AsyncStorage.removeItem('token');
-          return router.replace('/login');
-
+          router.replace('/splash');
         }
+      } else {
+        router.replace('/splash');
       }
     } catch (error) {
       console.error('Auth check failed', error);
       setToken(null);
-      return router.replace('/login');
+      router.replace('/login');
     }
   };
 
   const login = async (email: string, password: string) => {
-    const response = await api.post('/auth/login/', { email, password });
-    const newToken = response.data.token;
-    console.log(newToken);
+    try {
+      const response = await api.post('/auth/login/', { email, password });
+      const newToken = response.data.token;
 
-    if (newToken.startsWith('Invalid')) {
-      setToken(null);
-      console.error('Login failed', newToken);
-      return router.replace('/login');
-
+      if (newToken.startsWith('Invalid')) {
+        setToken(null);
+        console.error('Login failed', newToken);
+        router.replace('/login');
+      } else {
+        await setTokenAndPersist(newToken);
+        router.replace('/home');
+      }
+    } catch (error) {
+      console.error('Login failed', error);
     }
-    setToken(newToken);
-    await AsyncStorage.setItem('token', newToken);
-    return router.replace('/home');
-
   };
 
   const register = async (email: string, password: string) => {
-    const response = await api.post('/auth/register/', { email, password });
-    const newToken = response.data.token;
-    if (newToken.startsWith('Invalid')) {
-      setToken(null);
-      console.error('Login failed', newToken);
-      return router.replace('/register');
+    try {
+      const response = await api.post('/auth/register/', { email, password });
+      const newToken = response.data.token;
+
+      if (newToken.startsWith('Invalid')) {
+        setToken(null);
+        console.error('Registration failed', newToken);
+        router.replace('/register');
+      } else {
+        await setTokenAndPersist(newToken);
+        router.replace('/home');
+      }
+    } catch (error) {
+      console.error('Registration failed', error);
     }
-
-    setToken(newToken);
-    await AsyncStorage.setItem('token', newToken);
-    return router.replace('/home');
-
   };
 
   const logout = async () => {
     setToken(null);
     await AsyncStorage.removeItem('token');
-    return router.replace('/login');
+    router.replace('/login');
+  };
+
+  const setTokenAndPersist = async (newToken: string) => {
+    setToken(newToken);
+    await AsyncStorage.setItem('token', newToken);
   };
 
   return (
