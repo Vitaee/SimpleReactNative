@@ -16,14 +16,12 @@ const SplashScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/images/icon.png')}
+        source={require('../../assets/images/bg.jpeg')}
         style={styles.backgroundImage}
       />
       <View style={styles.contentContainer}>
-        <Image
-          source={require('../../assets/images/partial-react-logo.png')}
-          style={styles.image}
-        />
+        <Text style={styles.titleText}>Makyaj App</Text>
+
         <View style={styles.buttonContainer}>
           <Pressable style={[styles.button, styles.loginButton]} onPress={navigateToLogin}>
             <Text style={styles.buttonText}>Log In</Text>
@@ -83,6 +81,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  titleText: {
+    color: 'gray',
+    fontSize: 25,
+    textAlign: 'center'
+  }
 });
 
 export default SplashScreen;

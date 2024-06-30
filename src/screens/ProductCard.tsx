@@ -1,38 +1,83 @@
-import React from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import React, { memo } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { useThemeColor } from '@/hooks/useThemeColor';
+import { Ionicons } from '@expo/vector-icons';
 import { Product } from '../../constants/ProductType';
 
 interface ProductCardProps {
-    product: Product;
+  product: Product;
 }
 
-const ProductCard:  React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard:  React.FC<ProductCardProps> = memo(({ product }) => {
+  const cardBackgroundColor = useThemeColor({}, 'cardBackground');
+  const cardTextColor = useThemeColor({}, 'cardText');
+
   return (
-    <ThemedView style={styles.card}>
+    <TouchableOpacity style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
       <Image source={{ uri: product.product_image }} style={styles.image} />
-      <ThemedText type="title">{product.product_name}</ThemedText>
-      <ThemedText>{product.product_brand}</ThemedText>
-      <ThemedText>{`Price: ${product.product_price}`}</ThemedText>
-      <ThemedText>{`Discount: ${product.product_discount}`}</ThemedText>
-      <ThemedText>{product.product_description}</ThemedText>
-    </ThemedView>
+      <ThemedText style={[styles.title, { color: cardTextColor }]}>{product.product_name}</ThemedText>
+      <View style={styles.ratingContainer}>
+        <Ionicons name="star" size={16} color="#ffd700" />
+        <Text style={[styles.rating, { color: cardTextColor }]}>4.0</Text>
+      </View>
+      <ThemedText style={[styles.price, { color: cardTextColor }]}>{product.product_price} tl</ThemedText>
+      <Text style={styles.discountedPrice}>{product.product_discount} tl</Text>
+      <TouchableOpacity style={styles.favoriteButton}>
+        <Ionicons name="heart-outline" size={24} color="#ff6347" />
+      </TouchableOpacity>
+    </TouchableOpacity>
   );
-};
+});
 
 const styles = StyleSheet.create({
   card: {
-    marginBottom: 16,
-    padding: 16,
+    flex: 1,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    padding: 16,
+    margin: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 5,
+    alignItems: 'center',
   },
   image: {
-    width: '100%',
-    height: 200,
-    borderRadius: 8,
+    width: 60,
+    height: 60,
+    marginBottom: 8,
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  rating: {
+    marginLeft: 4,
+    fontSize: 12,
+  },
+  price: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  discountedPrice: {
+    fontSize: 12,
+    color: '#999',
+    textDecorationLine: 'line-through',
+    marginBottom: 8,
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
   },
 });
 

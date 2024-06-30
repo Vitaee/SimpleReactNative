@@ -1,76 +1,110 @@
-import type { PropsWithChildren, ReactElement } from 'react';
-import { StyleSheet, useColorScheme } from 'react-native';
+import React, { PropsWithChildren } from 'react';
+import { StyleSheet, ViewStyle } from 'react-native';
 import Animated, {
-  interpolate,
   useAnimatedRef,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
-  useScrollViewOffset,
+  useSharedValue,
+  interpolate,
 } from 'react-native-reanimated';
-
 import { ThemedView } from '@/components/ThemedView';
 
-const HEADER_HEIGHT = 250;
+const ITEM_WIDTH = 100; // Adjust based on your item width
+const HEADER_HEIGHT = 200; // Adjust based on your header height
 
 type Props = PropsWithChildren<{
-  headerImage: ReactElement;
-  headerBackgroundColor: { dark: string; light: string };
+  style?: ViewStyle;
+  contentContainerStyle?: ViewStyle;
+  horizontal?: boolean;
 }>;
 
 export default function ParallaxScrollView({
   children,
-  headerImage,
-  headerBackgroundColor,
+  style,
+  contentContainerStyle,
+  horizontal = false,
 }: Props) {
-  const colorScheme = useColorScheme() ?? 'light';
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
-  const scrollOffset = useScrollViewOffset(scrollRef);
+  const scrollValue = useSharedValue(0);
 
-  const headerAnimatedStyle = useAnimatedStyle(() => {
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollValue.value = horizontal ? event.contentOffset.x : event.contentOffset.y;
+    },
+  });
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const inputRange = horizontal
+      ? [-ITEM_WIDTH, 0, ITEM_WIDTH]
+      : [-HEADER_HEIGHT, 0, HEADER_HEIGHT];
+
+    const outputRangeTranslate = horizontal
+      ? [-ITEM_WIDTH / 2, 0, ITEM_WIDTH * 0.75]
+      : [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75];
+
     return {
-      transform: [
-        {
-          translateY: interpolate(
-            scrollOffset.value,
-            [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75]
-          ),
-        },
-        {
-          scale: interpolate(scrollOffset.value, [-HEADER_HEIGHT, 0, HEADER_HEIGHT], [2, 1, 1]),
-        },
-      ],
+      transform: horizontal
+        ? [
+            {
+              translateX: interpolate(
+                scrollValue.value,
+                inputRange,
+                outputRangeTranslate
+              ),
+            },
+            {
+              scale: interpolate(
+                scrollValue.value,
+                inputRange,
+                [2, 1, 1]
+              ),
+            },
+          ]
+        : [
+            {
+              translateY: interpolate(
+                scrollValue.value,
+                inputRange,
+                outputRangeTranslate
+              ),
+            },
+            {
+              scale: interpolate(
+                scrollValue.value,
+                inputRange,
+                [2, 1, 1]
+              ),
+            },
+          ],
     };
   });
 
   return (
-    <ThemedView style={styles.container}>
-      <Animated.ScrollView ref={scrollRef} scrollEventThrottle={16}>
-        <Animated.View
-          style={[
-            styles.header,
-            { backgroundColor: headerBackgroundColor[colorScheme] },
-            headerAnimatedStyle,
-          ]}>
-          {headerImage}
-        </Animated.View>
-        <ThemedView style={styles.content}>{children}</ThemedView>
-      </Animated.ScrollView>
-    </ThemedView>
+    <Animated.ScrollView
+      ref={scrollRef}
+      horizontal={horizontal}
+      onScroll={scrollHandler}
+      scrollEventThrottle={16}
+      style={[style]}
+      contentContainerStyle={[
+        horizontal ? styles.horizontalContent : styles.verticalContent,
+        contentContainerStyle,
+      ]}
+    >
+      <Animated.View style={horizontal ? styles.horizontalContent : styles.verticalContent}>
+        {children}
+      </Animated.View>
+    </Animated.ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  verticalContent: {
+    flexGrow: 1,
   },
-  header: {
-    height: 250,
-    overflow: 'hidden',
+  horizontalContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  content: {
-    flex: 1,
-    padding: 32,
-    gap: 16,
-    overflow: 'hidden',
-  },
+  
 });

@@ -50,7 +50,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (error) {
       console.error('Auth check failed', error);
       setToken(null);
-      router.replace('/login');
+      router.replace('/splash');
     }
   };
 
