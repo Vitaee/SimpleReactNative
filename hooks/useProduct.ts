@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '@env';
 
 
-export function useProducts(pageNumber: number, searchQuery: string) {
+export function useProducts(pageNumber: number, searchQuery: string, brandId?: any) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -15,8 +15,11 @@ export function useProducts(pageNumber: number, searchQuery: string) {
     const fetchProducts = async () => {
       setLoading(true);
       try {
+        console.log(brandId);
         const token = await AsyncStorage.getItem('token');
-        const response = await axios.get<ApiResponse>(API_URL + '/product/', {
+        const response = await axios.get<ApiResponse>(brandId 
+          ? `${API_URL}/product/brand/${brandId}` 
+          : `${API_URL}/product/`, {
           params: {
             page: pageNumber,
             query: searchQuery,
@@ -35,7 +38,8 @@ export function useProducts(pageNumber: number, searchQuery: string) {
     };
 
     fetchProducts();
-  }, [pageNumber, searchQuery]);
+  }, [pageNumber, searchQuery, brandId]);
 
   return { products, loading, error, pagination };
 }
+

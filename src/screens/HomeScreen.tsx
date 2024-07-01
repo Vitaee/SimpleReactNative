@@ -8,6 +8,7 @@ import ProductCard from './ProductCard';
 import { useThemeColor } from '../../hooks/useThemeColor';
 import { Ionicons } from '@expo/vector-icons';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { useLocalSearchParams } from 'expo-router';
 
 const HomeScreen: React.FC = () => {
   const ITEM_HEIGHT = 200;
@@ -16,6 +17,9 @@ const HomeScreen: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [sortBy, setSortBy] = useState('popularity');
+
+  const { brandId } = useLocalSearchParams();
+
 
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
@@ -27,7 +31,7 @@ const HomeScreen: React.FC = () => {
 
   const { products, loading, error, pagination } = searchQuery
     ? useSearchProducts(searchQuery, pageNumber)
-    : useProducts(pageNumber, searchQuery);
+    : useProducts(pageNumber, searchQuery, brandId);
 
 
   const handleSearch = (text: string) => {

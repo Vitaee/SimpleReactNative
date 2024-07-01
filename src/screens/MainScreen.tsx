@@ -1,76 +1,104 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import api from "../services/api"
+import { useNavigation } from '@react-navigation/native';
+import { router } from 'expo-router';
+
+
+
+interface Brand {
+    _id: string;
+    brand_name: string;
+    brand_logo: string;
+}
 
 
 export default function MainScreen() {
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const cardBackgroundColor = useThemeColor({}, 'cardBackground');
-  const borderColor = useThemeColor({}, 'borderColor');
-
-  return (
-    <ThemedView style={[styles.container, { backgroundColor }]}>
-      <View style={styles.header}>
-        <View style={styles.userInfo}>
-          <Image
-            source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ89z2EoiIKoPHSP7MXxpFqXmxt5m-yle52hLQqbzi6MRGhygMgctSnuq_Qlw&s' }}
-            style={styles.profilePic}
-          />
-          <View>
-            <ThemedText style={styles.greeting}>Merhaba,</ThemedText>
-            <ThemedText style={styles.username}>Joe Doe</ThemedText>
+    const [brands, setBrands] = useState<Brand[]>([]);
+    const backgroundColor = useThemeColor({}, 'background');
+    const textColor = useThemeColor({}, 'text');
+    const cardBackgroundColor = useThemeColor({}, 'cardBackground');
+    const borderColor = useThemeColor({}, 'borderColor');
+    const navigation = useNavigation();
+  
+    useEffect(() => {
+      const fetchBrands = async () => {
+        try {
+          const response = await api.get('/brand/');
+          if (response.data.success) {
+            setBrands(response.data.data);
+          }
+        } catch (error) {
+          console.error('Error fetching brands:', error);
+        }
+      };
+  
+      fetchBrands();
+    }, []);
+  
+    const handleBrandPress = (brandId: string) => {
+        router.replace({ pathname: "/home", params: { brandId: brandId } });
+    };
+  
+    return (
+      <ThemedView style={[styles.container, { backgroundColor }]}>
+        <View style={styles.header}>
+          <View style={styles.userInfo}>
+            <Image
+              source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ89z2EoiIKoPHSP7MXxpFqXmxt5m-yle52hLQqbzi6MRGhygMgctSnuq_Qlw&s' }}
+              style={styles.profilePic}
+            />
+            <View>
+              <ThemedText style={styles.greeting}>Merhaba,</ThemedText>
+              <ThemedText style={styles.username}>Joe Doe</ThemedText>
+            </View>
           </View>
+          <TouchableOpacity>
+            <Ionicons name="notifications-outline" size={24} color={textColor} />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity>
-          <Ionicons name="notifications-outline" size={24} color={textColor} />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView style={styles.content}>
-        <View style={[styles.promoCard, { backgroundColor: '#6b46c1' }]}>
-          <ThemedText style={styles.promoText}>Gratis'te sevdiğin ruj 20 ₺</ThemedText>
-        </View>
-
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.bannerScroll}>
-          <View style={[styles.bannerCard, { backgroundColor: '#8b5cf6' }]}>
-            <ThemedText style={styles.bannerTitle}>NOTE & PASTEL</ThemedText>
-            <ThemedText style={styles.bannerSubtitle}>makyaj ürünlerinde</ThemedText>
-            <ThemedText style={styles.bannerDiscount}>%40 İNDİRİM</ThemedText>
+  
+        <ScrollView style={styles.content}>
+          <View style={[styles.promoCard, { backgroundColor: '#6b46c1' }]}>
+            <ThemedText style={styles.promoText}>Gratis'te sevdiğin ruj 20 ₺</ThemedText>
           </View>
-          <View style={[styles.bannerCard, { backgroundColor: '#8b5cf6' }]}>
-            <ThemedText style={styles.bannerTitle}>Ruj & PASTEL</ThemedText>
-            <ThemedText style={styles.bannerDiscount}>%30 İNDİRİM</ThemedText>
+  
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.bannerScroll}>
+            <View style={[styles.bannerCard, { backgroundColor: '#8b5cf6' }]}>
+              <ThemedText style={styles.bannerTitle}>NOTE & PASTEL</ThemedText>
+              <ThemedText style={styles.bannerSubtitle}>makyaj ürünlerinde</ThemedText>
+              <ThemedText style={styles.bannerDiscount}>%40 İNDİRİM</ThemedText>
+            </View>
+            {/* Add more banner cards here */}
+          </ScrollView>
+  
+          <ThemedText style={styles.sectionTitle}>İndirimli Markalar</ThemedText>
+          <ThemedText style={styles.sectionSubtitle}>Aktüel ürünleri keşfet indirimleri kaçırma</ThemedText>
+  
+          <View style={styles.brandList}>
+            {brands.map((brand) => (
+              <TouchableOpacity
+                key={brand._id}
+                style={[styles.brandCard, { backgroundColor: cardBackgroundColor, borderColor }]}
+                onPress={() => handleBrandPress(brand._id)}
+              >
+                <Image
+                  source={{ uri: brand.brand_logo }}
+                  style={styles.brandLogo}
+                />
+                <ThemedText style={styles.brandName}>{brand.brand_name}</ThemedText>
+                <ThemedText style={styles.brandDiscount}>100 Yeni İndirim</ThemedText>
+                <ThemedText style={styles.viewAll}>Tümünü Gör →</ThemedText>
+              </TouchableOpacity>
+            ))}
           </View>
-          <View style={[styles.bannerCard, { backgroundColor: '#8b5cf6' }]}>
-            <ThemedText style={styles.bannerTitle}>Kalem & PASTEL</ThemedText>
-            <ThemedText style={styles.bannerDiscount}>%20 İNDİRİM</ThemedText>
-          </View>
-          {/* Add more banner cards here */}
         </ScrollView>
-
-        <ThemedText style={styles.sectionTitle}>İndirimli Markalar</ThemedText>
-        <ThemedText style={styles.sectionSubtitle}>Aktüel ürünleri keşfet indirimleri kaçırma</ThemedText>
-
-        <View style={styles.brandList}>
-          {['Watsons', 'Eve', 'Gratis'].map((brand, index) => (
-            <TouchableOpacity key={index} style={[styles.brandCard, { backgroundColor: cardBackgroundColor, borderColor }]}>
-              <Image
-                source={{ uri: `https://banner2.cleanpng.com/20180811/pvw/kisspng-watsons-retail-personal-care-cosmetics-beauty-watsons-id-apps-on-google-play-5b6f0f265db177.8070437615340050303838.jpg` }}
-                style={styles.brandLogo}
-              />
-              <ThemedText style={styles.brandName}>{brand}</ThemedText>
-              <ThemedText style={styles.brandDiscount}>100 Yeni İndirim</ThemedText>
-              <ThemedText style={styles.viewAll}>Tümünü Gör →</ThemedText>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
-    </ThemedView>
-  );
+      </ThemedView>
+    );
 }
 
 const styles = StyleSheet.create({
