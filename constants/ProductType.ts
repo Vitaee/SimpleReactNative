@@ -30,6 +30,7 @@ export interface Event {
     like_count: number;
     comment_count: number;
     updatedAt: string;
+    createdAt: string;
   }
   
   export interface Pagination {
@@ -39,7 +40,7 @@ export interface Event {
     number_of_page: number;
   }
   
-  export interface ApiResponse {
+  export interface ProductApiResponse {
     success: boolean;
     data: Product[];
     pagination: Pagination;

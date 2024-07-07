@@ -38,7 +38,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         if (response.data.user) {
           setToken(storedToken);
-          router.replace('/home');
+          router.replace('/main');
         } else {
           setToken(null);
           await AsyncStorage.removeItem('token');
@@ -65,7 +65,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         router.replace('/login');
       } else {
         await setTokenAndPersist(newToken);
-        router.replace('/home');
+        router.replace('/main');
       }
     } catch (error) {
       console.error('Login failed', error);
@@ -83,7 +83,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         router.replace('/register');
       } else {
         await setTokenAndPersist(newToken);
-        router.replace('/home');
+        router.replace('/main');
       }
     } catch (error) {
       console.error('Registration failed', error);

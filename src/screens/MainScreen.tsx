@@ -11,9 +11,11 @@ import { router } from 'expo-router';
 
 
 interface Brand {
-    _id: string;
+    count: number;
     brand_name: string;
     brand_logo: string;
+    brand_id: string;
+    
 }
 
 
@@ -28,7 +30,7 @@ export default function MainScreen() {
     useEffect(() => {
       const fetchBrands = async () => {
         try {
-          const response = await api.get('/brand/');
+          const response = await api.get('/product/brand/discounts/');
           if (response.data.success) {
             setBrands(response.data.data);
           }
@@ -40,8 +42,9 @@ export default function MainScreen() {
       fetchBrands();
     }, []);
   
-    const handleBrandPress = (brandId: string) => {
-        router.replace({ pathname: "/home", params: { brandId: brandId } });
+    const handleBrandPress = (brandId: string, brandName: string) => {
+      console.log(brandName);
+        router.replace({ pathname: "/products", params: { brandId: brandId, brandName: brandName } });
     };
   
     return (
@@ -76,22 +79,22 @@ export default function MainScreen() {
             {/* Add more banner cards here */}
           </ScrollView>
   
-          <ThemedText style={styles.sectionTitle}>İndirimli Markalar</ThemedText>
-          <ThemedText style={styles.sectionSubtitle}>Aktüel ürünleri keşfet indirimleri kaçırma</ThemedText>
+          <ThemedText style={styles.sectionTitle}>Tüm Markalar</ThemedText>
+          <ThemedText style={styles.sectionSubtitle}>Farklı markalardan ürünleri keşfet indirimleri kaçırma!</ThemedText>
   
           <View style={styles.brandList}>
             {brands.map((brand) => (
               <TouchableOpacity
-                key={brand._id}
+                key={brand.brand_id}
                 style={[styles.brandCard, { backgroundColor: cardBackgroundColor, borderColor }]}
-                onPress={() => handleBrandPress(brand._id)}
+                onPress={() => handleBrandPress(brand.brand_id, brand.brand_name)}
               >
                 <Image
                   source={{ uri: brand.brand_logo }}
                   style={styles.brandLogo}
                 />
                 <ThemedText style={styles.brandName}>{brand.brand_name}</ThemedText>
-                <ThemedText style={styles.brandDiscount}>100 Yeni İndirim</ThemedText>
+                <ThemedText style={styles.brandDiscount}>{brand.count} Yeni İndirim</ThemedText>
                 <ThemedText style={styles.viewAll}>Tümünü Gör →</ThemedText>
               </TouchableOpacity>
             ))}

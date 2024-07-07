@@ -29,9 +29,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="home"
+        name="products"
         options={{
-          title: "Home",
+          title: "Ürünler",
           tabBarIcon: ({ color }) => <TabBarIcon name="eye" color={color} />,
         }}
       />

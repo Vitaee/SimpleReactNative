@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ApiResponse, Product, Pagination } from '../constants/ProductType';
+import { ProductApiResponse, Product, Pagination } from '../constants/ProductType';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '@env';
 
 
-export function useProducts(pageNumber: number, searchQuery: string, brandId?: any) {
+export function useProducts(pageNumber: number, searchQuery: string, brandId?: any, selectedCategory?:string) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -15,9 +15,8 @@ export function useProducts(pageNumber: number, searchQuery: string, brandId?: a
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        console.log(brandId);
         const token = await AsyncStorage.getItem('token');
-        const response = await axios.get<ApiResponse>(brandId 
+        const response = await axios.get<ProductApiResponse>(brandId 
           ? `${API_URL}/product/brand/${brandId}` 
           : `${API_URL}/product/`, {
           params: {
@@ -26,11 +25,11 @@ export function useProducts(pageNumber: number, searchQuery: string, brandId?: a
           },
           headers: { Authorization: `Bearer ${token}` },
         });
-        setProducts(prevProducts => 
-          pageNumber === 1 ? response.data.data : [...prevProducts, ...response.data.data]
-        );
+        //setProducts(prevProducts =>  pageNumber === 1 ? response.data.data : [...prevProducts, ...response.data.data] );
+        setProducts(response.data.data);
         setPagination(response.data.pagination);
       } catch (err) {
+        console.log(err);
         setError(err as Error);
       } finally {
         setLoading(false);
@@ -38,7 +37,7 @@ export function useProducts(pageNumber: number, searchQuery: string, brandId?: a
     };
 
     fetchProducts();
-  }, [pageNumber, searchQuery, brandId]);
+  }, [pageNumber, searchQuery, brandId, selectedCategory]);
 
   return { products, loading, error, pagination };
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { TextInput, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, View, ScrollView, Modal } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -8,30 +8,35 @@ import ProductCard from './ProductCard';
 import { useThemeColor } from '../../hooks/useThemeColor';
 import { Ionicons } from '@expo/vector-icons';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
+import { useProductCategories } from '@/hooks/useProductCategories';
 
-const HomeScreen: React.FC = () => {
+const ProductsScreen: React.FC = () => {
   const ITEM_HEIGHT = 200;
   const [pageNumber, setPageNumber] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
-  const [sortBy, setSortBy] = useState('popularity');
+  const [selectedCategory, setSelectedCategory] = useState('');
 
-  const { brandId } = useLocalSearchParams();
-
+  const { brandId, brandName } = useLocalSearchParams();
+  const navigation = useNavigation();
 
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const placeholderColor = useThemeColor({}, 'placeholderColor');
   const borderColor = useThemeColor({}, 'borderColor');
 
-  const selectedCategory = "Tümü"
-  
+  const { products, loading, error, pagination } = useProducts(pageNumber, searchQuery, brandId, selectedCategory);
 
-  const { products, loading, error, pagination } = searchQuery
-    ? useSearchProducts(searchQuery, pageNumber)
-    : useProducts(pageNumber, searchQuery, brandId);
+  useEffect(() => {
+    if (brandId) {
+      navigation.setOptions({
+        title: `${brandName} Ürünleri`,
+      });
+    }
+  }, [navigation, brandId, brandName]);
+  
+  const { categories,  categoriesLoading,  categoriesError } = useProductCategories(brandId);
 
 
   const handleSearch = (text: string) => {
@@ -39,21 +44,18 @@ const HomeScreen: React.FC = () => {
     setPageNumber(1);
   };
 
+  const handleCategoryChange = (categoryText: string) => {
+    setSearchQuery(''); 
+    setPageNumber(1); 
+    setSelectedCategory(categoryText);
+  };
+
   const loadMoreProducts = () => {
     if (pagination && pageNumber < pagination.number_of_page) {
       setPageNumber((prev) => prev + 1);
     }
   };
-  const categories = [
-    { id: '1', name: 'Tümü', icon: 'apps-outline' },
-    { id: '2', name: 'Saç Bakımı', icon: 'cut-outline' },
-    { id: '3', name: 'Tırnak', icon: 'hand-left-outline' },
-    { id: '4', name: 'Parfüm', icon: 'flask-outline' },
-    { id: '5', name: 'Test 1', icon: 'flask-outline' },
-    { id: '6', name: 'Test2', icon: 'flask-outline' },
-    { id: '7', name: 'Test 3', icon: 'flask-outline' },
 
-  ];
 
   /*const renderFilterModal = () => (
     <Modal
@@ -124,32 +126,37 @@ const HomeScreen: React.FC = () => {
 
       <ParallaxScrollView
         horizontal={true}
-        style={styles.categoriesContainer}
         contentContainerStyle={styles.categoriesContent}
-      >
-        {categories.map(category => (
+      >{categoriesLoading ? 
+        (<ActivityIndicator size="large" color={textColor} />) : categoriesError ? 
+        (<ThemedText style={{ color: textColor }}>Error loading product categories</ThemedText>):
+        (categories.map(category => (
           <TouchableOpacity
             key={category.id}
             style={[
               styles.categoryButton,
               selectedCategory === category.id && styles.selectedCategory
             ]}
-            onPress={() => {console.log("pressed", category.name)}}
+            onPress={() => {handleCategoryChange( category.name)}}
           >
             <Ionicons name="apps-outline" size={24} color={textColor} />
-            <ThemedText style={styles.categoryText}>{category.name}</ThemedText>
+            <ThemedText style={styles.categoryText}> {category.name.length > 15 ? category.name.substring(0, 12) + '...' : category.name}</ThemedText>
           </TouchableOpacity>
-        ))}
+        )))}
       </ParallaxScrollView>
 
       {loading && pageNumber === 1 ? (
         <ActivityIndicator size="large" color={textColor} />
       ) : error ? (
         <ThemedText style={{ color: textColor }}>Error loading products</ThemedText>
+      ) : products.length === 0 ? (
+        <ThemedView style={{ flex:1 ,justifyContent: 'center', alignItems: 'center'}}>
+          <ThemedText style={{ color: textColor}}>No products found for this brand</ThemedText>
+        </ThemedView>
       ) : (
         <FlatList
           data={products}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item, index) => `${item._id}-${index}`}
           renderItem={({ item }) => <ProductCard product={item} />}
           initialNumToRender={6}
           numColumns={2}
@@ -195,10 +202,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     padding: 8,
   },
-  categoriesContainer: {
-    marginBottom: 16,
-    marginTop: 8
-  },
+  
   categoriesContent: {
     paddingHorizontal: 1,
   },
@@ -278,4 +282,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default ProductsScreen;
