@@ -13,9 +13,19 @@ const ProductCard:  React.FC<ProductCardProps> = memo(({ product }) => {
   const cardBackgroundColor = useThemeColor({}, 'cardBackground');
   const cardTextColor = useThemeColor({}, 'cardText');
 
+  const getImageUri = () => {
+    if (Array.isArray(product.product_image)) {
+      // Use the first image if product_image is an array
+      return product.product_image[0];
+    } else {
+      // Otherwise, product_image is a single URI string
+      return product.product_image;
+    }
+  };
+
   return (
     <TouchableOpacity style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
-      <Image source={{ uri: product.product_image }} style={styles.image} />
+      <Image source={{  uri: getImageUri() }} style={styles.image} />
       <ThemedText style={[styles.title, { color: cardTextColor }]}>{product.product_name}</ThemedText>
       <View style={styles.ratingContainer}>
         <Ionicons name="star" size={16} color="#ffd700" />

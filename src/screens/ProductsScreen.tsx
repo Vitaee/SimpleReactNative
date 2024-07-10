@@ -26,7 +26,8 @@ const ProductsScreen: React.FC = () => {
   const placeholderColor = useThemeColor({}, 'placeholderColor');
   const borderColor = useThemeColor({}, 'borderColor');
 
-  const { products, loading, error, pagination } = useProducts(pageNumber, searchQuery, brandId, selectedCategory);
+  const { products, loading, error, pagination } = useProducts(pageNumber, brandId, selectedCategory);
+  const { searchProducts, searchLoading, searchError, searchPagination } = useSearchProducts(searchQuery, pageNumber);
 
   useEffect(() => {
     if (brandId) {
@@ -34,6 +35,8 @@ const ProductsScreen: React.FC = () => {
         title: `${brandName} Ürünleri`,
       });
     }
+    setPageNumber(1);
+    setSearchQuery('');
   }, [navigation, brandId, brandName]);
   
   const { categories,  categoriesLoading,  categoriesError } = useProductCategories(brandId);
@@ -51,8 +54,15 @@ const ProductsScreen: React.FC = () => {
   };
 
   const loadMoreProducts = () => {
-    if (pagination && pageNumber < pagination.number_of_page) {
-      setPageNumber((prev) => prev + 1);
+    if(searchQuery){
+      if (searchPagination && pageNumber < searchPagination.number_of_page) {
+        setPageNumber((prev) => prev + 1);
+      }
+    } else {
+
+      if (pagination && pageNumber < pagination.number_of_page) {
+        setPageNumber((prev) => prev + 1);
+      }
     }
   };
 
@@ -127,32 +137,53 @@ const ProductsScreen: React.FC = () => {
       <ParallaxScrollView
         horizontal={true}
         contentContainerStyle={styles.categoriesContent}
-      >{categoriesLoading ? 
-        (<ActivityIndicator size="large" color={textColor} />) : categoriesError ? 
-        (<ThemedText style={{ color: textColor }}>Error loading product categories</ThemedText>):
-        (categories.map(category => (
-          <TouchableOpacity
-            key={category.id}
-            style={[
-              styles.categoryButton,
-              selectedCategory === category.id && styles.selectedCategory
-            ]}
-            onPress={() => {handleCategoryChange( category.name)}}
-          >
-            <Ionicons name="apps-outline" size={24} color={textColor} />
-            <ThemedText style={styles.categoryText}> {category.name.length > 15 ? category.name.substring(0, 12) + '...' : category.name}</ThemedText>
-          </TouchableOpacity>
-        )))}
+      >
+        {categoriesLoading ? (
+          <ActivityIndicator size="large" color={textColor} />
+        ) : categoriesError ? (
+          <ThemedText style={{ color: textColor }}>Error loading product categories</ThemedText>
+        ) : (
+          categories.map(category => (
+            <TouchableOpacity
+              key={category.id}
+              style={[
+                styles.categoryButton,
+                selectedCategory === category.id && styles.selectedCategory
+              ]}
+              onPress={() => handleCategoryChange(category.name)}
+            >
+              <Ionicons name="apps-outline" size={24} color={textColor} />
+              <ThemedText style={styles.categoryText}>
+                {category.name.length > 15 ? category.name.substring(0, 12) + '...' : category.name}
+              </ThemedText>
+            </TouchableOpacity>
+          ))
+        )}
       </ParallaxScrollView>
 
-      {loading && pageNumber === 1 ? (
+      {searchLoading && pageNumber === 1 && searchQuery ? (
         <ActivityIndicator size="large" color={textColor} />
       ) : error ? (
         <ThemedText style={{ color: textColor }}>Error loading products</ThemedText>
-      ) : products.length === 0 ? (
-        <ThemedView style={{ flex:1 ,justifyContent: 'center', alignItems: 'center'}}>
-          <ThemedText style={{ color: textColor}}>No products found for this brand</ThemedText>
-        </ThemedView>
+      ) : searchQuery ? (
+        searchProducts.length === 0 ? (
+          <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <ThemedText style={{ color: textColor }}>No products found for this search</ThemedText>
+          </ThemedView>
+        ) : (
+          <FlatList
+            data={searchProducts}
+            keyExtractor={(item, index) => `${item._id}-${index}`}
+            renderItem={({ item }) => <ProductCard product={item} />}
+            initialNumToRender={6}
+            numColumns={2}
+            columnWrapperStyle={styles.row}
+            onEndReached={loadMoreProducts}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={searchLoading && pageNumber > 1 ? <ActivityIndicator size="small" color={textColor} /> : null}
+            getItemLayout={(data, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })}
+          />
+        )
       ) : (
         <FlatList
           data={products}
@@ -164,12 +195,9 @@ const ProductsScreen: React.FC = () => {
           onEndReached={loadMoreProducts}
           onEndReachedThreshold={0.5}
           ListFooterComponent={loading && pageNumber > 1 ? <ActivityIndicator size="small" color={textColor} /> : null}
-          getItemLayout={(data, index) => (
-            { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
-          )}
+          getItemLayout={(data, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })}
         />
       )}
-      {/*renderFilterModal()*/}
     </ThemedView>
   );
 };
