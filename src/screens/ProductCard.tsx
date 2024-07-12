@@ -4,6 +4,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { Ionicons } from '@expo/vector-icons';
 import { Product } from '../../constants/ProductType';
+import { router } from 'expo-router';
 
 interface ProductCardProps {
   product: Product;
@@ -23,8 +24,12 @@ const ProductCard:  React.FC<ProductCardProps> = memo(({ product }) => {
     }
   };
 
+  const handlePress = () => {
+    const encodedProduct = encodeURIComponent(JSON.stringify(product));
+    router.push(`/productdetail?product=${encodedProduct}`);
+  };
   return (
-    <TouchableOpacity style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
+    <TouchableOpacity style={[styles.card, { backgroundColor: cardBackgroundColor }]} onPress={handlePress}>
       <Image source={{  uri: getImageUri() }} style={styles.image} />
       <ThemedText style={[styles.title, { color: cardTextColor }]}>{product.product_name}</ThemedText>
       <View style={styles.ratingContainer}>
