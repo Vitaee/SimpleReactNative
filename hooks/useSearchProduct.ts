@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { ProductApiResponse, Product, Pagination } from '../constants/ProductType';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/src/services/api';
 
 
@@ -15,7 +13,6 @@ export function useSearchProducts(searchQuery: string, pageNumber: number) {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-       
         const response = await api.post<ProductApiResponse>('/product/search/', 
         {
           product_name: searchQuery,

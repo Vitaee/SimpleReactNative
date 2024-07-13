@@ -29,15 +29,9 @@ const ProfileScreen = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
           const response = await api.get('/auth/', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
           });
           setUser(response.data.user);
-        }
       } catch (error) {
         console.error('Error fetching user data:', error);
         setError(true);
@@ -106,11 +100,7 @@ const ProfileScreen = () => {
             </View>
           </View>
         </View>
-
-        
       </View>
-
-    
     </ThemedView>
   );
 };

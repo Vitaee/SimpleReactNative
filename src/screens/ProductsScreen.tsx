@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { TextInput, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, View, ScrollView, Modal } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -10,6 +10,8 @@ import { Ionicons } from '@expo/vector-icons';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useProductCategories } from '@/hooks/useProductCategories';
+import { Product } from '@/constants/ProductType';
+import { useCategoryProducts } from '@/hooks/useCategoryProducts';
 
 const ProductsScreen: React.FC = () => {
   const ITEM_HEIGHT = 200;
@@ -17,6 +19,11 @@ const ProductsScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('');
+
+  const [loadingState, setLoadingState] = useState(false);
+  const [errorState, setErrorState] = useState<string | null>(null);
+  const [data, setData] = useState<Product[]>([]);
+
 
   const { brandId, brandName } = useLocalSearchParams();
   const navigation = useNavigation();
@@ -26,9 +33,6 @@ const ProductsScreen: React.FC = () => {
   const placeholderColor = useThemeColor({}, 'placeholderColor');
   const borderColor = useThemeColor({}, 'borderColor');
 
-  const { products, loading, error, pagination } = useProducts(pageNumber, brandId, selectedCategory);
-  const { searchProducts, searchLoading, searchError, searchPagination } = useSearchProducts(searchQuery, pageNumber);
-
   useEffect(() => {
     if (brandId) {
       navigation.setOptions({
@@ -37,83 +41,80 @@ const ProductsScreen: React.FC = () => {
     }
     setPageNumber(1);
     setSearchQuery('');
+    setSelectedCategory('');
   }, [navigation, brandId, brandName]);
   
+  
+  const { products, loading, error, pagination } = useProducts(pageNumber, brandId, selectedCategory);
+  const { searchProducts, searchLoading, searchError, searchPagination } = useSearchProducts(searchQuery, pageNumber);
+  const { categoryProducts, categoryLoading, categoryError, categoryPagination } = useCategoryProducts(selectedCategory, pageNumber, brandId);
+
+
+  useEffect(() => {
+    if (pageNumber === 1) {
+      if (searchQuery) {
+        setData(searchProducts);
+      } else if (selectedCategory) {
+        setData(categoryProducts);
+      } else {
+        setData(products);
+      }
+    } else {
+      if (searchQuery) {
+        setData((prevData) => [...prevData, ...searchProducts]);
+      } else if (selectedCategory) {
+        setData((prevData) => [...prevData, ...categoryProducts]);
+      } else {
+        setData((prevData) => [...prevData, ...products]);
+      }
+    }
+  
+    if (searchQuery) {
+      setLoadingState(searchLoading);
+      setErrorState(searchError);
+    } else if (selectedCategory) {
+      setLoadingState(categoryLoading);
+      setErrorState(categoryError);
+    } else {
+      setLoadingState(loading);
+      setErrorState(error);
+    }
+  }, [pageNumber, searchQuery, selectedCategory, products, searchProducts, categoryProducts, loading, searchLoading, categoryLoading, error, searchError, categoryError]);
+  
+
+
+
   const { categories,  categoriesLoading,  categoriesError } = useProductCategories(brandId);
 
 
   const handleSearch = (text: string) => {
     setSearchQuery(text);
     setPageNumber(1);
+    setData([]); // Clear data for new search
   };
-
+  
   const handleCategoryChange = (categoryText: string) => {
-    setSearchQuery(''); 
-    setPageNumber(1); 
+    setSearchQuery('');
+    setPageNumber(1);
     setSelectedCategory(categoryText);
+    setData([]); // Clear data for new category
   };
 
-  const loadMoreProducts = () => {
+  const loadMoreProducts = useCallback(() => {
     if(searchQuery){
       if (searchPagination && pageNumber < searchPagination.number_of_page) {
         setPageNumber((prev) => prev + 1);
       }
+    } else if (selectedCategory) {
+      if (categoryPagination && pageNumber < categoryPagination!.number_of_page) {
+        setPageNumber((prev) => prev + 1);
+      }
     } else {
-
       if (pagination && pageNumber < pagination.number_of_page) {
         setPageNumber((prev) => prev + 1);
       }
     }
-  };
-
-
-  /*const renderFilterModal = () => (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={showFilters}
-      onRequestClose={() => setShowFilters(false)}
-    >
-    <ThemedView style={{ backgroundColor }}>
-      <ThemedText style={styles.modalTitle}>Filtrele</ThemedText>
-          <View style={styles.filterSection}>
-            <ThemedText>Fiyat Aralığı:</ThemedText>
-            <View style={styles.priceInputs}>
-              <TextInput
-                style={styles.priceInput}
-                placeholder="Min"
-                keyboardType="numeric"
-                value={priceRange.min.toString()}
-                onChangeText={(text) => setPriceRange({ ...priceRange, min: parseInt(text) || 0 })}
-              />
-              <ThemedText>-</ThemedText>
-              <TextInput
-                style={styles.priceInput}
-                placeholder="Max"
-                keyboardType="numeric"
-                value={priceRange.max.toString()}
-                onChangeText={(text) => setPriceRange({ ...priceRange, max: parseInt(text) || 1000 })}
-              />
-            </View>
-          </View>
-        <View style={styles.filterSection}>
-          <ThemedText>Sırala:</ThemedText>
-          <TouchableOpacity onPress={() => setSortBy('popularity')} style={styles.sortButton}>
-            <ThemedText style={sortBy === 'popularity' ? styles.selectedSort : {}}>Popülerlik</ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setSortBy('price_asc')} style={styles.sortButton}>
-            <ThemedText style={sortBy === 'price_asc' ? styles.selectedSort : {}}>Fiyat: Artan</ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setSortBy('price_desc')} style={styles.sortButton}>
-            <ThemedText style={sortBy === 'price_desc' ? styles.selectedSort : {}}>Fiyat: Azalan</ThemedText>
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity style={styles.applyButton} onPress={() => setShowFilters(false)}>
-          <ThemedText style={styles.applyButtonText}>Uygula</ThemedText>
-        </TouchableOpacity>
-      </ThemedView>
-    </Modal>
-  );*/
+  }, [searchQuery, searchPagination, selectedCategory, categoryPagination, pagination, pageNumber]);
 
 
   return (
@@ -148,7 +149,7 @@ const ProductsScreen: React.FC = () => {
               key={category.id}
               style={[
                 styles.categoryButton,
-                selectedCategory === category.id && styles.selectedCategory
+                selectedCategory === category.name && styles.selectedCategory
               ]}
               onPress={() => handleCategoryChange(category.name)}
             >
@@ -161,32 +162,14 @@ const ProductsScreen: React.FC = () => {
         )}
       </ParallaxScrollView>
 
-      {searchLoading && pageNumber === 1 && searchQuery ? (
+      {loadingState ? (
         <ActivityIndicator size="large" color={textColor} />
-      ) : error ? (
+      ) : errorState ? (
         <ThemedText style={{ color: textColor }}>Error loading products</ThemedText>
-      ) : searchQuery ? (
-        searchProducts.length === 0 ? (
-          <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <ThemedText style={{ color: textColor }}>No products found for this search</ThemedText>
-          </ThemedView>
-        ) : (
-          <FlatList
-            data={searchProducts}
-            keyExtractor={(item, index) => `${item._id}-${index}`}
-            renderItem={({ item }) => <ProductCard product={item} />}
-            initialNumToRender={6}
-            numColumns={2}
-            columnWrapperStyle={styles.row}
-            onEndReached={loadMoreProducts}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={searchLoading && pageNumber > 1 ? <ActivityIndicator size="small" color={textColor} /> : null}
-            getItemLayout={(data, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })}
-          />
-        )
-      ) : (
+      ) :
+      (
         <FlatList
-          data={products}
+          data={data}
           keyExtractor={(item, index) => `${item._id}-${index}`}
           renderItem={({ item }) => <ProductCard product={item} />}
           initialNumToRender={6}
@@ -194,8 +177,9 @@ const ProductsScreen: React.FC = () => {
           columnWrapperStyle={styles.row}
           onEndReached={loadMoreProducts}
           onEndReachedThreshold={0.5}
-          ListFooterComponent={loading && pageNumber > 1 ? <ActivityIndicator size="small" color={textColor} /> : null}
+          ListFooterComponent={loadingState && pageNumber > 1 ? <ActivityIndicator size="small" color={textColor} /> : null}
           getItemLayout={(data, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })}
+          
         />
       )}
     </ThemedView>
@@ -241,9 +225,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginHorizontal: 5,
     borderRadius: 8,
+    backgroundColor: 'grey', // Default background color
   },
   selectedCategory: {
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    backgroundColor: 'blue',
   },
   categoryText: {
     marginTop: 5,

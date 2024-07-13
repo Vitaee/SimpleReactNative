@@ -13,9 +13,7 @@ const ProductDetail = () => {
   let parsedProduct: Product | null = null;
 
   try {
-    // Safely decode and parse the product data
-    parsedProduct = JSON.parse(decodeURIComponent(encodeURIComponent(product))) ;
-    parsedProduct as Product;
+    parsedProduct = JSON.parse(decodeURIComponent(encodeURIComponent(!product))) as Product ;
   } catch (error) {
     console.error('Failed to parse product data:', error);
     return (
