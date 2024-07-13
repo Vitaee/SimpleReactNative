@@ -1,3 +1,5 @@
+import { User } from "./UserType";
+
 export interface TimelineEvent {
     _id: string;
     timeline: string;
@@ -42,7 +44,7 @@ export interface TimelineEvent {
     description: string;
     image: string[];
     events: TimelineEvent[];
-    user: string;
+    user: User;
     like_count: number;
     comment_count: number;
     createdAt: string;

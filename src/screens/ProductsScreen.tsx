@@ -74,7 +74,6 @@ const ProductsScreen: React.FC = () => {
       <SearchBar
         searchQuery={searchQuery}
         handleSearch={handleSearch}
-        setShowFilters={setShowFilters}
       />
 
       <ParallaxScrollView

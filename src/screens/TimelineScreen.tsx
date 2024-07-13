@@ -9,6 +9,7 @@ import { useThemeColor } from '../../hooks/useThemeColor';
 import ParallaxScrollView from '../../components/ParallaxScrollView';
 import { TimelineApiResponse, TimelineData } from '@/constants/TimelineType';
 import SearchBar from '@/components/SearchBar';
+import { useRouter } from 'expo-router';
 
 const TimelineScreen = () => {
     const [pageNumber, setPageNumber] = useState(1);
@@ -21,6 +22,9 @@ const TimelineScreen = () => {
     const navigation = useNavigation();
 
     const [timelineData, setTimelineData] = useState<TimelineData[]>([]);
+
+    const router = useRouter();
+
 
     useEffect(() => {
         const fetchTimelineData = async () => {
@@ -42,17 +46,25 @@ const TimelineScreen = () => {
         setPageNumber(1);
     };
 
+    const handleItemPress = (item: TimelineData) => {
+        router.push({
+          pathname: 'timelinedetail',
+          params: {
+            data: JSON.stringify(item)
+          }
+        });
+      };
+
     return (
         <ThemedView style={[styles.container, { backgroundColor }]}>
             <SearchBar
             searchQuery={searchQuery}
             handleSearch={handleSearch}
-            setShowFilters={setShowFilters}
         />
         <ParallaxScrollView>
             {timelineData.map((item) => (
-            <View key={item._id} style={[styles.card, { borderColor }]}>
-                <Image source={{ uri: item.product.product_image }} style={styles.productImage} />
+            <TouchableOpacity key={item._id} style={[styles.card, { borderColor }]} onPress={() => handleItemPress(item)}>
+                <Image source={{ uri: item.image[0] }} style={styles.productImage} />
                 <View style={styles.productInfo}>
                 <ThemedText style={[styles.productName, { color: textColor }]}>{item.product.product_name}</ThemedText>
                 <ThemedText style={[styles.productDescription, { color: textColor }]}>{item.description}</ThemedText>
@@ -67,7 +79,7 @@ const TimelineScreen = () => {
                     </TouchableOpacity>
                 </View>
                 </View>
-            </View>
+            </TouchableOpacity>
             ))}
         </ParallaxScrollView>
         </ThemedView>

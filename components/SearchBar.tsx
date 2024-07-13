@@ -1,18 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '../hooks/useThemeColor';
+import FilterModal from './FilterModal';
 
 interface SearchBarProps {
   searchQuery: string;
   handleSearch: (text: string) => void;
-  setShowFilters: (show: boolean) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, handleSearch, setShowFilters }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, handleSearch  }) => {
   const borderColor = useThemeColor({}, 'borderColor');
   const textColor = useThemeColor({}, 'text');
   const placeholderColor = useThemeColor({}, 'background');
+
+  const [showFilters, setShowFilters] = useState(false);
+
+  const handleApplyFilters = (filters: any) => {
+    console.log(filters);
+  };
 
   return (
     <View style={styles.header}>
@@ -27,8 +33,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, handleSearch, setSho
         />
       </View>
       <TouchableOpacity onPress={() => setShowFilters(true)} style={styles.filterButton}>
-        <Ionicons name="options-outline" size={24} color={textColor} />
-      </TouchableOpacity>
+          <Ionicons name="options-outline" size={24} color={textColor} />
+        </TouchableOpacity>
+        <FilterModal visible={showFilters} onClose={() => setShowFilters(false)} onApply={handleApplyFilters} />
+
     </View>
   );
 };
