@@ -15,16 +15,20 @@ export function useProducts(pageNumber: number, brandId?: any, selectedCategory?
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const token = await AsyncStorage.getItem('token');
-        const response = await api.get<ProductApiResponse>(brandId 
-          ? `/product/brand/${brandId}` 
-          : `/product/`, {
-          params: {
-            page: pageNumber,
-            category: selectedCategory
-          },
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        let response;
+        if (selectedCategory) {
+          response = await api.get(`product/category/${brandId}/${selectedCategory}/`, {
+            params: { page: pageNumber },
+          });
+        } else {
+          response = await api.get(brandId 
+            ? `/product/brand/${brandId}` 
+            : `/product/`, {
+            params: {
+              page: pageNumber,
+              category: selectedCategory
+            }});
+        }
         
         setProducts(prevProducts =>  pageNumber === 1 ? response.data.data : [...prevProducts, ...response.data.data] );
         //setProducts(response.data.data);

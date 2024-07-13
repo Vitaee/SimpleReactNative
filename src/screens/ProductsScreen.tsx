@@ -37,6 +37,8 @@ const ProductsScreen: React.FC = () => {
     }
     setPageNumber(1);
     setSearchQuery('');
+    setSelectedCategory('');
+ 
   }, [navigation, brandId, brandName]);
   
   const { categories,  categoriesLoading,  categoriesError } = useProductCategories(brandId);
@@ -65,56 +67,6 @@ const ProductsScreen: React.FC = () => {
       }
     }
   };
-
-
-  /*const renderFilterModal = () => (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={showFilters}
-      onRequestClose={() => setShowFilters(false)}
-    >
-    <ThemedView style={{ backgroundColor }}>
-      <ThemedText style={styles.modalTitle}>Filtrele</ThemedText>
-          <View style={styles.filterSection}>
-            <ThemedText>Fiyat Aralığı:</ThemedText>
-            <View style={styles.priceInputs}>
-              <TextInput
-                style={styles.priceInput}
-                placeholder="Min"
-                keyboardType="numeric"
-                value={priceRange.min.toString()}
-                onChangeText={(text) => setPriceRange({ ...priceRange, min: parseInt(text) || 0 })}
-              />
-              <ThemedText>-</ThemedText>
-              <TextInput
-                style={styles.priceInput}
-                placeholder="Max"
-                keyboardType="numeric"
-                value={priceRange.max.toString()}
-                onChangeText={(text) => setPriceRange({ ...priceRange, max: parseInt(text) || 1000 })}
-              />
-            </View>
-          </View>
-        <View style={styles.filterSection}>
-          <ThemedText>Sırala:</ThemedText>
-          <TouchableOpacity onPress={() => setSortBy('popularity')} style={styles.sortButton}>
-            <ThemedText style={sortBy === 'popularity' ? styles.selectedSort : {}}>Popülerlik</ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setSortBy('price_asc')} style={styles.sortButton}>
-            <ThemedText style={sortBy === 'price_asc' ? styles.selectedSort : {}}>Fiyat: Artan</ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setSortBy('price_desc')} style={styles.sortButton}>
-            <ThemedText style={sortBy === 'price_desc' ? styles.selectedSort : {}}>Fiyat: Azalan</ThemedText>
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity style={styles.applyButton} onPress={() => setShowFilters(false)}>
-          <ThemedText style={styles.applyButtonText}>Uygula</ThemedText>
-        </TouchableOpacity>
-      </ThemedView>
-    </Modal>
-  );*/
-
 
   return (
     <ThemedView style={[styles.container, { backgroundColor }]}>
