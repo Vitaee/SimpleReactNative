@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { ProductApiResponse, Product, Pagination } from '../constants/ProductType';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/src/services/api';
 
 

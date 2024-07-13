@@ -7,11 +7,12 @@ import { ThemedView } from '@/components/ThemedView';
 import { router } from 'expo-router';
 import  api  from '../services/api';
 import { useThemeColor } from '../../hooks/useThemeColor';
+import { UserApiResponse } from '@/constants/UserType';
 
 
 
 const ProfileScreen = () => {
-  const [user, setUser] = useState<any>(null); // should include user type
+  const [user, setUser] = useState<UserApiResponse>(); // should include user type
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const backgroundColor = useThemeColor({}, 'background');
@@ -31,12 +32,8 @@ const ProfileScreen = () => {
       try {
         const token = await AsyncStorage.getItem('token');
         if (token) {
-          const response = await api.get('/auth/', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          setUser(response.data.user);
+          const response = await api.get('/auth/', {});
+          setUser(response.data);
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -44,6 +41,7 @@ const ProfileScreen = () => {
       } finally {
         setLoading(false);
       }
+
     };
 
     fetchUserData();
@@ -64,7 +62,7 @@ const ProfileScreen = () => {
           </TouchableOpacity>
         </View>
         <ThemedText style={styles.profileName}>Joe Doe</ThemedText>
-        <ThemedText type='subtitle' style={styles.profileName}>can@gmail.com</ThemedText>
+        <ThemedText type='subtitle' style={styles.profileName}>{user?.user.email}</ThemedText>
 
         <TouchableOpacity style={styles.editButton}>
           <Ionicons name="create-outline" size={24} color="purple" />

@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { ProductApiResponse, Product, Pagination } from '../constants/ProductType';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/src/services/api';
 
 
@@ -17,11 +15,17 @@ export function useProducts(pageNumber: number, brandId?: any, selectedCategory?
       try {
         let response;
         if (selectedCategory) {
-          response = await api.get(`product/category/${brandId}/${selectedCategory}/`, {
-            params: { page: pageNumber },
-          });
+          if(brandId){
+            response = await api.get<ProductApiResponse>(`product/category/${brandId}/${selectedCategory}/`, {
+              params: { page: pageNumber },
+            });
+          } else{
+            response = await api.get<ProductApiResponse>(`product/category/${selectedCategory}/`, {
+              params: { page: pageNumber },
+            });
+          }
         } else {
-          response = await api.get(brandId 
+          response = await api.get<ProductApiResponse>(brandId 
             ? `/product/brand/${brandId}` 
             : `/product/`, {
             params: {
@@ -31,7 +35,6 @@ export function useProducts(pageNumber: number, brandId?: any, selectedCategory?
         }
         
         setProducts(prevProducts =>  pageNumber === 1 ? response.data.data : [...prevProducts, ...response.data.data] );
-        //setProducts(response.data.data);
         setPagination(response.data.pagination);
       } catch (err) {
         console.log(err);

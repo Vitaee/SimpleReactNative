@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useProductCategories } from '@/hooks/useProductCategories';
+import SearchBar from '@/components/SearchBar';
 
 const ProductsScreen: React.FC = () => {
   const ITEM_HEIGHT = 200;
@@ -70,21 +71,11 @@ const ProductsScreen: React.FC = () => {
 
   return (
     <ThemedView style={[styles.container, { backgroundColor }]}>
-      <View style={styles.header}>
-        <View style={[styles.searchContainer, { backgroundColor: borderColor }]}>
-          <Ionicons name="search" size={20} color={placeholderColor} style={styles.searchIcon} />
-          <TextInput
-            style={[styles.searchBar, { color: textColor }]}
-            placeholder="Ara"
-            placeholderTextColor={placeholderColor}
-            value={searchQuery}
-            onChangeText={handleSearch}
-          />
-        </View>
-        <TouchableOpacity onPress={() => setShowFilters(true)} style={styles.filterButton}>
-          <Ionicons name="options-outline" size={24} color={textColor} />
-        </TouchableOpacity>
-      </View>
+      <SearchBar
+        searchQuery={searchQuery}
+        handleSearch={handleSearch}
+        setShowFilters={setShowFilters}
+      />
 
       <ParallaxScrollView
         horizontal={true}
@@ -158,29 +149,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  searchContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchBar: {
-    flex: 1,
-    height: 40,
-  },
-  filterButton: {
-    marginLeft: 10,
-    padding: 8,
   },
   
   categoriesContent: {
