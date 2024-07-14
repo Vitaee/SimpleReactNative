@@ -32,8 +32,7 @@ export function useProducts(pageNumber: number, brandId?: any, selectedCategory?
               page: pageNumber,
               category: selectedCategory
             }});
-        }
-        
+        }        
         setProducts(prevProducts =>  pageNumber === 1 ? response.data.data : [...prevProducts, ...response.data.data] );
         setPagination(response.data.pagination);
       } catch (err) {

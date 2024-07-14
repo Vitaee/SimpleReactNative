@@ -23,7 +23,7 @@ export interface Event {
     product_price: string;
     product_discount: string;
     product_description: string;
-    product_image: string | string[];
+    product_image:  string[];
     product_category: string;
     product_link: string;
     events: Event[];

@@ -49,7 +49,7 @@ const TimelineDetailScreen = () => {
         </View>
 
         <View style={[styles.productCard, { borderColor }]}>
-          <Image source={{ uri: parsedData!.product.product_image }} style={styles.productImage} />
+          <Image source={{ uri: parsedData!.product.product_image[0] }} style={styles.productImage} />
           <View style={styles.productDetails}>
             <ThemedText style={styles.productTitle}>Ürün</ThemedText>
             <ThemedText style={styles.productSubtitle}>{parsedData?.product.product_name}</ThemedText>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import api from '../services/api';
@@ -19,7 +18,6 @@ const TimelineScreen = () => {
     const backgroundColor = useThemeColor({}, 'background');
     const textColor = useThemeColor({}, 'text');
     const borderColor = useThemeColor({}, 'borderColor');
-    const navigation = useNavigation();
 
     const [timelineData, setTimelineData] = useState<TimelineData[]>([]);
 

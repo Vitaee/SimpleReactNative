@@ -5,7 +5,6 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import api from "../services/api"
-import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
 
 
@@ -25,7 +24,6 @@ export default function MainScreen() {
     const textColor = useThemeColor({}, 'text');
     const cardBackgroundColor = useThemeColor({}, 'cardBackground');
     const borderColor = useThemeColor({}, 'borderColor');
-    const navigation = useNavigation();
   
     useEffect(() => {
       const fetchBrands = async () => {

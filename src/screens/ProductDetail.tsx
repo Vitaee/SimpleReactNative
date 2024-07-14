@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import {  ThemedText } from '../../components/ThemedText'; // Adjust the path according to your project structure
 import { Product } from '../../constants/ProductType';
-import { useRouter, useLocalSearchParams, useNavigation } from 'expo-router';
+import { useRouter, useLocalSearchParams, useNavigation, router } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 
 
@@ -40,6 +40,10 @@ const ProductDetail = () => {
 
   const navigation = useNavigation();
 
+  const openWebView = (url: string | undefined) => {
+    router.push({ pathname: '/webview', params: { url: url }});
+  };
+
   useEffect(() => {
     if (parsedProduct?.product_name) {
       navigation.setOptions({
@@ -60,11 +64,12 @@ const ProductDetail = () => {
         </View>
         <ThemedText style={[styles.title, { color: cardTextColor }]}>{parsedProduct?.product_name}</ThemedText>
         <Text style={[styles.description, { color: cardTextColor }]}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Adipiscing nibh interdum adipiscing curabitur
+          {parsedProduct?.product_description}
         </Text>
         <View style={styles.priceContainer}>
           <ThemedText style={[styles.price, { color: cardTextColor }]}>{parsedProduct?.product_price} tl</ThemedText>
           <Text style={styles.discountedPrice}>{parsedProduct?.product_discount} tl</Text>
+          <TouchableOpacity onPress={ () => {openWebView(parsedProduct?.product_link)}}><ThemedText type='subtitle'>Orjinal Link</ThemedText></TouchableOpacity>
         </View>
         <View style={styles.commentsContainer}>
           <Text style={[styles.commentsTitle, { color: textColor }]}>Yorumlar</Text>
