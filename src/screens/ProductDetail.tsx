@@ -6,6 +6,7 @@ import {  ThemedText } from '../../components/ThemedText'; // Adjust the path ac
 import { Product } from '../../constants/ProductType';
 import { useRouter, useLocalSearchParams, useNavigation, router } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
+import ImageGallery from '@/components/ImageGallery';
 
 
 const ProductDetail = () => {
@@ -16,6 +17,7 @@ const ProductDetail = () => {
     // Safely decode and parse the product data
     parsedProduct = JSON.parse(decodeURIComponent(encodeURIComponent(product))) ;
     parsedProduct as Product;
+    console.log(parsedProduct?.product_image.length);
   } catch (error) {
     console.error('Failed to parse product data:', error);
     return (
@@ -30,11 +32,11 @@ const ProductDetail = () => {
   const cardBackgroundColor = useThemeColor({}, 'cardBackground');
   const cardTextColor = useThemeColor({}, 'cardText');
 
-  const getImageUri = () => {
+  const getImageUris = () => {
     if (Array.isArray(parsedProduct?.product_image)) {
-      return parsedProduct?.product_image[0];
-    } else {
       return parsedProduct?.product_image;
+    } else {
+      return [parsedProduct?.product_image];
     }
   };
 
@@ -56,7 +58,7 @@ const ProductDetail = () => {
   return (
     <ScrollView style={[styles.container, { backgroundColor }]}>
       
-      <Image source={{ uri: getImageUri() }} style={styles.image} />
+      <ImageGallery images={getImageUris()} />
       <View style={[styles.detailsContainer, { backgroundColor: cardBackgroundColor }]}>
         <View style={styles.ratingContainer}>
           <Ionicons name="star" size={16} color="#ffd700" />

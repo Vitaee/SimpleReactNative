@@ -1,51 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, ScrollView, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import api from "../services/api"
-import { router } from 'expo-router';
-
-
-
-interface Brand {
-    count: number;
-    brand_name: string;
-    brand_logo: string;
-    brand_id: string;
-    
-}
+import { useRouter } from 'expo-router';
+import { useBrandStore } from '../context/main/BrandsStore'; // Adjust the path as necessary
 
 
 export default function MainScreen() {
-    const [brands, setBrands] = useState<Brand[]>([]);
-    const backgroundColor = useThemeColor({}, 'background');
-    const textColor = useThemeColor({}, 'text');
-    const cardBackgroundColor = useThemeColor({}, 'cardBackground');
-    const borderColor = useThemeColor({}, 'borderColor');
+  const brands = useBrandStore((state) => state.brands);
+  const loading = useBrandStore((state) => state.loading);
+  const error = useBrandStore((state) => state.error);
+  const fetchBrands = useBrandStore((state) => state.fetchBrands);
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const cardBackgroundColor = useThemeColor({}, 'cardBackground');
+  const borderColor = useThemeColor({}, 'borderColor');
+  const router = useRouter();
+
+  useEffect(() => {
+    fetchBrands();
+  }, [fetchBrands]);
+
+  const handleBrandPress = (brandId: string, brandName: string) => {
+    console.log(brandName);
+    router.replace({ pathname: "/products", params: { brandId, brandName } });
+  };
   
-    useEffect(() => {
-      const fetchBrands = async () => {
-        try {
-          const response = await api.get('/product/brand/discounts/');
-          if (response.data.success) {
-            setBrands(response.data.data);
-          }
-        } catch (error) {
-          console.error('Error fetching brands:', error);
-        }
-      };
-  
-      fetchBrands();
-    }, []);
-  
-    const handleBrandPress = (brandId: string, brandName: string) => {
-      console.log(brandName);
-        router.replace({ pathname: "/products", params: { brandId: brandId, brandName: brandName } });
-    };
-  
-    return (
+  return (
       <ThemedView style={[styles.container, { backgroundColor }]}>
         <View style={styles.header}>
           <View style={styles.userInfo}>
@@ -81,7 +64,8 @@ export default function MainScreen() {
           <ThemedText style={styles.sectionSubtitle}>Farklı markalardan ürünleri keşfet indirimleri kaçırma!</ThemedText>
   
           <View style={styles.brandList}>
-            {brands.map((brand) => (
+            {loading ? <ActivityIndicator size="large" color={textColor} /> : 
+            ( error ? <ThemedText style={{ color: textColor }}>{error}</ThemedText> : brands.map((brand) => (
               <TouchableOpacity
                 key={brand.brand_id}
                 style={[styles.brandCard, { backgroundColor: cardBackgroundColor, borderColor }]}
@@ -95,7 +79,7 @@ export default function MainScreen() {
                 <ThemedText style={styles.brandDiscount}>{brand.count} Yeni İndirim</ThemedText>
                 <ThemedText style={styles.viewAll}>Tümünü Gör →</ThemedText>
               </TouchableOpacity>
-            ))}
+            )))}
           </View>
         </ScrollView>
       </ThemedView>

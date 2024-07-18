@@ -1,16 +1,14 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TextInput, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, View, ScrollView, Modal } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { useSearchProducts } from '../../hooks/useSearchProduct';
-import { useProducts } from '../../hooks/useProduct';
 import ProductCard from './ProductCard';
 import { useThemeColor } from '../../hooks/useThemeColor';
 import { Ionicons } from '@expo/vector-icons';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
-import { useProductCategories } from '@/hooks/useProductCategories';
 import SearchBar from '@/components/SearchBar';
+import { useProductStore } from '../context/products/ProductStore';
 
 const ProductsScreen: React.FC = () => {
   const ITEM_HEIGHT = 200;
@@ -27,8 +25,22 @@ const ProductsScreen: React.FC = () => {
   const placeholderColor = useThemeColor({}, 'placeholderColor');
   const borderColor = useThemeColor({}, 'borderColor');
 
-  const { products, loading, error, pagination } = useProducts(pageNumber, brandId, selectedCategory);
-  const { searchProducts, searchLoading, searchError, searchPagination } = useSearchProducts(searchQuery, pageNumber);
+  const {
+    products,
+    loading,
+    error,
+    pagination,
+    searchProducts,
+    searchLoading,
+    searchError,
+    searchPagination,
+    categories,
+    categoriesLoading,
+    categoriesError,
+    fetchProducts,
+    fetchSearchProducts,
+    fetchCategories,
+  } = useProductStore();
 
   useEffect(() => {
     if (brandId) {
@@ -39,11 +51,17 @@ const ProductsScreen: React.FC = () => {
     setPageNumber(1);
     setSearchQuery('');
     setSelectedCategory('');
- 
+    fetchCategories(brandId?.toString());
+    fetchProducts(1, brandId?.toString(), '');
   }, [navigation, brandId, brandName]);
-  
-  const { categories,  categoriesLoading,  categoriesError } = useProductCategories(brandId);
 
+  useEffect(() => {
+    if (searchQuery) {
+      fetchSearchProducts(searchQuery, pageNumber);
+    } else {
+      fetchProducts(pageNumber, brandId?.toString(), selectedCategory);
+    }
+  }, [pageNumber, searchQuery, selectedCategory, brandId]);
 
   const handleSearch = (text: string) => {
     setSearchQuery(text);
@@ -51,18 +69,17 @@ const ProductsScreen: React.FC = () => {
   };
 
   const handleCategoryChange = (categoryText: string) => {
-    setSearchQuery(''); 
-    setPageNumber(1); 
+    setSearchQuery('');
+    setPageNumber(1);
     setSelectedCategory(categoryText);
   };
 
   const loadMoreProducts = () => {
-    if(searchQuery){
+    if (searchQuery) {
       if (searchPagination && pageNumber < searchPagination.number_of_page) {
         setPageNumber((prev) => prev + 1);
       }
     } else {
-
       if (pagination && pageNumber < pagination.number_of_page) {
         setPageNumber((prev) => prev + 1);
       }

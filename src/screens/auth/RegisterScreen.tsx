@@ -1,24 +1,27 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuthStore } from '../../context/AuthStore'; // Adjust the path as necessary
 import { useRouter } from 'expo-router';
 import AuthLayoutComponent from './AuthLayout';
 
 const RegisterScreen: React.FC = () => {
-  const { register } = useAuth();
+  const register = useAuthStore((state) => state.register);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
 
   const handleRegister = async () => {
     try {
-      await register(email, password);
+      const isRegisterSucces = await register(email, password);
+      isRegisterSucces ? router.replace('/main') : router.replace('/login')
+
     } catch (error) {
       console.error('Registration failed', error);
+      router.replace('/login')
     }
   };
 
   const handleLogin = () => {
-    router.push('login');
+    router.push('/login');
   };
 
   return (
