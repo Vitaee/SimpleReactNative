@@ -6,11 +6,11 @@ const SplashScreen: React.FC = () => {
   const router = useRouter();
 
   const navigateToLogin = () => {
-    router.push('/login');
+    router.push('/auth/login');
   };
 
   const navigateToRegister = () => {
-    router.push('/register');
+    router.push('/auth/register');
   };
 
   return (

@@ -45,6 +45,7 @@ const TimelineScreen = () => {
     };
 
     const handleItemPress = (item: TimelineData) => {
+
         router.push({
           pathname: 'timelinedetail',
           params: {

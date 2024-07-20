@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 import { useAuthStore } from '../src/context/AuthStore'; // Adjust the path as necessary
 import { useColorScheme } from '../hooks/useColorScheme'; // Adjust the path as necessary
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -20,8 +21,19 @@ export default function RootLayout() {
   useEffect(() => {
     async function prepare() {
       try {
-        const isAuthenticated = await checkAuthStatus();
-        isAuthenticated ? router.replace('/main') : router.replace('/splash')
+        const storedToken = await AsyncStorage.getItem('token');
+        if (storedToken === null) {
+          router.replace('/splash');
+        } else{
+          const isAuthenticated = await checkAuthStatus();
+          if(isAuthenticated) { 
+            router.replace('/main') 
+          } else { 
+             await AsyncStorage.removeItem('token'); 
+             router.replace('/splash') 
+          }
+        }
+        
       } catch (e) {
         console.warn(e);
         router.replace('/splash')

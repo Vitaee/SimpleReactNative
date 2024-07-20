@@ -12,16 +12,16 @@ const RegisterScreen: React.FC = () => {
   const handleRegister = async () => {
     try {
       const isRegisterSucces = await register(email, password);
-      isRegisterSucces ? router.replace('/main') : router.replace('/login')
+      isRegisterSucces ? router.replace('/main') : router.replace('/auth/register')
 
     } catch (error) {
       console.error('Registration failed', error);
-      router.replace('/login')
+      router.replace('/auth/register')
     }
   };
 
   const handleLogin = () => {
-    router.push('/login');
+    router.push('/auth/login');
   };
 
   return (
@@ -29,6 +29,7 @@ const RegisterScreen: React.FC = () => {
       title="Register"
       email={email}
       setEmail={setEmail}
+      emailPlaceHolder = 'joe@example.com'
       password={password}
       setPassword={setPassword}
       handleSubmit={handleRegister}

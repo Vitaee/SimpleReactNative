@@ -1,6 +1,7 @@
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedView } from '@/components/ThemedView';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React from 'react';
 import { Alert, Button, Image, Pressable, SafeAreaView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 
@@ -10,7 +11,8 @@ interface AuthLayout {
   title: string;
   email: string;
   setEmail: (email: string) => void;
-  password: string;
+  emailPlaceHolder: string;
+  password: string | null;
   setPassword: (password: string) => void;
   handleSubmit: () => void;
   submitText: string;
@@ -24,6 +26,7 @@ const AuthLayoutComponent: React.FC<AuthLayout> = ({
   title,
   email,
   setEmail,
+  emailPlaceHolder = "Email",
   password,
   setPassword,
   handleSubmit,
@@ -43,25 +46,27 @@ const AuthLayoutComponent: React.FC<AuthLayout> = ({
           <ThemedView style={styles.inputView}>
             <TextInput
               style={styles.input}
-              placeholder='Email'
+              placeholder={emailPlaceHolder}
               value={email}
               onChangeText={setEmail}
               autoCorrect={false}
               autoCapitalize='none'
             />
+            {password !== null ?             
             <TextInput
               style={styles.input}
               placeholder='Password'
               secureTextEntry
-              value={password}
+              value={password!}
               onChangeText={setPassword}
               autoCorrect={false}
               autoCapitalize='none'
-            />
+            /> : null}
+
           </ThemedView>
 
           <ThemedView style={styles.rememberView}>
-              <Pressable onPress={() => Alert.alert('Forget Password!')}>
+              <Pressable onPress={() => router.push('/auth/forgotpass')}>
                   {showText ? (
                   <Text style={styles.forgetText}>
                     Forgot Password ?

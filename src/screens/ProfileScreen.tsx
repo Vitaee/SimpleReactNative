@@ -33,7 +33,7 @@ const ProfileScreen = () => {
         const token = await AsyncStorage.getItem('token');
         if (token) {
           const response = await api.get('/auth/', {});
-          setUser(response.data);
+          setUser(response.data.data);
         }
       } catch (error) {
         console.error('Error fetching user data:', error);

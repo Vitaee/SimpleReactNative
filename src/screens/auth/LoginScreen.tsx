@@ -13,14 +13,14 @@ const LoginScreen: React.FC = () => {
     try {
       const isLoginSucces = await login(email, password);
       console.log(isLoginSucces, " login success mi")
-      isLoginSucces ? router.replace('/main') : router.replace('/login')
+      isLoginSucces ? router.replace('/main') : router.replace('/auth/login')
     } catch (error) {
-      router.replace('/login')
+      router.replace('/auth/login')
     }
   };
 
   const handleRegister = () => {
-    router.push('register');
+    router.push('/auth/register');
   };
 
   return (
@@ -28,6 +28,7 @@ const LoginScreen: React.FC = () => {
       title="Login"
       email={email}
       setEmail={setEmail}
+      emailPlaceHolder = 'joe@example.com'
       password={password}
       setPassword={setPassword}
       handleSubmit={handleLogin}
