@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AuthLayoutComponent from './AuthLayout';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/src/context/AuthStore';
+import { CONFIRM_RESET_SCREEN, RESET_PASS_SCREEN } from '@/constants/Routes';
 
 export const ConfirmResetPasswordScreen: React.FC = () => {
     const confirmResetPassword = useAuthStore((state) => state.confirmResetPassword);
@@ -11,17 +12,17 @@ export const ConfirmResetPasswordScreen: React.FC = () => {
     const handleconfirmResetPassword = async () => {
       try {
         const isConfirmResetPassword = await confirmResetPassword(code);
-        isConfirmResetPassword ? router.replace('/auth/resetpass') : router.replace('/auth/confirmreset')
+        isConfirmResetPassword ? router.replace(RESET_PASS_SCREEN) : router.replace(CONFIRM_RESET_SCREEN)
   
       } catch (error) {
-        console.error('Forget Password failed', error);
-        router.replace('/auth/forgotpass')
+        console.error('Confirm Code failed', error);
+        router.replace(CONFIRM_RESET_SCREEN)
       }
     };
   
     return (
       <AuthLayoutComponent
-        title="Confirm Reset Password"
+        title="Enter code."
         email={code}
         setEmail={setCode}
         emailPlaceHolder = '123456'

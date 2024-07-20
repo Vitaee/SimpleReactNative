@@ -6,6 +6,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useRouter } from 'expo-router';
 import { useBrandStore } from '../context/main/BrandsStore'; // Adjust the path as necessary
+import { PRODUCT_SCREEN } from '@/constants/Routes';
 
 
 export default function MainScreen() {
@@ -25,7 +26,7 @@ export default function MainScreen() {
 
   const handleBrandPress = (brandId: string, brandName: string) => {
     console.log(brandName);
-    router.replace({ pathname: "/products", params: { brandId, brandName } });
+    router.replace({ pathname: PRODUCT_SCREEN, params: { brandId, brandName } });
   };
   
   return (

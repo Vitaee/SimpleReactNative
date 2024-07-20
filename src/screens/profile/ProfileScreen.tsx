@@ -5,71 +5,63 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { router } from 'expo-router';
-import  api  from '../services/api';
-import { useThemeColor } from '../../hooks/useThemeColor';
+import  api  from '../../services/api';
+import { useThemeColor } from '../../../hooks/useThemeColor';
 import { UserApiResponse } from '@/constants/UserType';
+import { SPLASH_SCREEN } from '@/constants/Routes';
+import { useProfileStore } from '@/src/context/profile/ProfileStore';
+import ImagePickerComponent from '@/components/ImagePicker';
 
 
 
 const ProfileScreen = () => {
-  const [user, setUser] = useState<UserApiResponse>(); // should include user type
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const backgroundColor = useThemeColor({}, 'background');
+  const user = useProfileStore((state) => state.user);
+  const loading = useProfileStore((state) => state.loading);
+  const error = useProfileStore((state) => state.error);
+  const fetchUserData = useProfileStore((state) => state.fetchUserData);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
 
+
+  const backgroundColor = useThemeColor({}, 'background');
 
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('token');
-      router.replace('/splash');
+      router.replace(SPLASH_SCREEN);
     } catch (error) {
       console.error('Logout failed', error);
     }
   };
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
-          const response = await api.get('/auth/', {});
-          setUser(response.data.data);
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-
-    };
-
     fetchUserData();
-  }, []);
+  }, [fetchUserData]);
+
+  const handleImagePicked = (uri: string) => {
+    setProfileImage(uri);
+  };
 
   return (
     <ThemedView style={[styles.container, { backgroundColor } ]}>
-      
-
       <View style={styles.profileSection}>
         <View style={styles.profileImageContainer}>
           <Image
-            source={{ uri: 'https://png.pngtree.com/png-vector/20190223/ourmid/pngtree-profile-line-black-icon-png-image_691065.jpg' }}
+            source={{ uri: profileImage || 'https://png.pngtree.com/png-vector/20190223/ourmid/pngtree-profile-line-black-icon-png-image_691065.jpg' }}
             style={styles.profileImage}
           />
-          <TouchableOpacity style={styles.addButton}>
-            <Ionicons name="add" size={24} color="white" />
-          </TouchableOpacity>
+          
+          <ImagePickerComponent onImagePicked={handleImagePicked} />
+
         </View>
         <ThemedText style={styles.profileName}>Joe Doe</ThemedText>
-        <ThemedText type='subtitle' style={styles.profileName}>{user?.user.email}</ThemedText>
+        <ThemedText type='subtitle' style={styles.profileName}>{user?.data.user.email}</ThemedText>
 
         <TouchableOpacity style={styles.editButton}>
           <Ionicons name="create-outline" size={24} color="purple" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Ionicons  name="log-out" size={24} color="purple" />
+          <Ionicons name="log-out" size={24} color="purple" />
         </TouchableOpacity>
         <ThemedText style={styles.profileDescription}>
           My Bio text information data long message maybe.
@@ -103,12 +95,8 @@ const ProfileScreen = () => {
               <ThemedText>10</ThemedText>
             </View>
           </View>
-        </View>
-
-        
-      </View>
-
-    
+        </View>        
+      </View>    
     </ThemedView>
   );
 };
@@ -156,7 +144,7 @@ const styles = StyleSheet.create({
   editButton: {
     position: 'absolute',
     right: 16,
-    top: 16,
+    top: 12,
   },
   logoutButton: {
     position: 'absolute',

@@ -1,9 +1,8 @@
 import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, Tabs, router } from "expo-router";
+import { Tabs } from "expo-router";
 import { useColorScheme } from '../../hooks/useColorScheme'; // Adjust the path as necessary
 import { Colors } from "../../constants/Colors";
-
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
@@ -16,7 +15,6 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
@@ -49,7 +47,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
         }}
       />
-       
     </Tabs>
   );
 }

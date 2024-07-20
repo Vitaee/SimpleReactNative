@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { TextInput, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, View, ScrollView, Modal } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import ProductCard from './ProductCard';
-import { useThemeColor } from '../../hooks/useThemeColor';
+import ProductCard from '../../../components/ProductCard';
+import { useThemeColor } from '../../../hooks/useThemeColor';
 import { Ionicons } from '@expo/vector-icons';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import SearchBar from '@/components/SearchBar';
-import { useProductStore } from '../context/products/ProductStore';
+import { useProductStore } from '../../context/products/ProductStore';
 
 const ProductsScreen: React.FC = () => {
   const ITEM_HEIGHT = 200;

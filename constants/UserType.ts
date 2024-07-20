@@ -1,12 +1,17 @@
 export interface User {
-    _id: string,
-    email: string,
-    password: string,
-    createdAt: string,
-    updatedAt: string,
-    __v: number
+    _id: string;
+    email: string;
+    password: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+}
+
+export interface UserData {
+    user: User;
 }
 
 export interface UserApiResponse {
-    user: User;
+    data: UserData;
+    success: boolean;
 }

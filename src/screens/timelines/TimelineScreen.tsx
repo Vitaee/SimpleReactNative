@@ -3,12 +3,13 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import api from '../services/api';
-import { useThemeColor } from '../../hooks/useThemeColor';
-import ParallaxScrollView from '../../components/ParallaxScrollView';
+import api from '../../services/api';
+import { useThemeColor } from '../../../hooks/useThemeColor';
+import ParallaxScrollView from '../../../components/ParallaxScrollView';
 import { TimelineApiResponse, TimelineData } from '@/constants/TimelineType';
 import SearchBar from '@/components/SearchBar';
 import { useRouter } from 'expo-router';
+import { TIMELINE_DETAIL_SCREEN } from '@/constants/Routes';
 
 const TimelineScreen = () => {
     const [pageNumber, setPageNumber] = useState(1);
@@ -47,7 +48,7 @@ const TimelineScreen = () => {
     const handleItemPress = (item: TimelineData) => {
 
         router.push({
-          pathname: 'timelinedetail',
+          pathname: TIMELINE_DETAIL_SCREEN,
           params: {
             data: JSON.stringify(item)
           }

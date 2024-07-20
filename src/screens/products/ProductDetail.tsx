@@ -2,11 +2,12 @@ import React, { useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import {  ThemedText } from '../../components/ThemedText'; // Adjust the path according to your project structure
-import { Product } from '../../constants/ProductType';
+import {  ThemedText } from '../../../components/ThemedText'; // Adjust the path according to your project structure
+import { Product } from '../../../constants/ProductType';
 import { useRouter, useLocalSearchParams, useNavigation, router } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 import ImageGallery from '@/components/ImageGallery';
+import { WEBVIEW_SCREEN } from '@/constants/Routes';
 
 
 const ProductDetail = () => {
@@ -43,7 +44,7 @@ const ProductDetail = () => {
   const navigation = useNavigation();
 
   const openWebView = (url: string | undefined) => {
-    router.push({ pathname: '/webview', params: { url: url }});
+    router.push({ pathname: WEBVIEW_SCREEN, params: { url: url }});
   };
 
   useEffect(() => {

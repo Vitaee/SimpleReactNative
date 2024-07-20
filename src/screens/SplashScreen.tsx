@@ -1,16 +1,17 @@
 import React from 'react';
 import { View, Image, StyleSheet, Pressable, Text } from 'react-native';
 import { useRouter } from 'expo-router';
+import { LOGIN_SCREEN, REGISTER_SCREEN } from '@/constants/Routes';
 
 const SplashScreen: React.FC = () => {
   const router = useRouter();
 
   const navigateToLogin = () => {
-    router.push('/auth/login');
+    router.push(LOGIN_SCREEN);
   };
 
   const navigateToRegister = () => {
-    router.push('/auth/register');
+    router.push(REGISTER_SCREEN);
   };
 
   return (

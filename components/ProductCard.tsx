@@ -3,8 +3,9 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { Ionicons } from '@expo/vector-icons';
-import { Product } from '../../constants/ProductType';
+import { Product } from '../constants/ProductType';
 import { router } from 'expo-router';
+import { PRODUCT_DETAIL_SCREEN } from '@/constants/Routes';
 
 interface ProductCardProps {
   product: Product;
@@ -26,7 +27,7 @@ const ProductCard:  React.FC<ProductCardProps> = memo(({ product }) => {
 
   const handlePress = () => {
     const encodedProduct = encodeURIComponent(JSON.stringify(product));
-    router.push(`/productdetail?product=${encodedProduct}`);
+    router.push(`${PRODUCT_DETAIL_SCREEN}?product=${encodedProduct}`);
   };
   return (
     <TouchableOpacity style={[styles.card, { backgroundColor: cardBackgroundColor }]} onPress={handlePress}>

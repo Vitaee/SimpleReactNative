@@ -7,6 +7,8 @@ import 'react-native-reanimated';
 import { useAuthStore } from '../src/context/AuthStore'; // Adjust the path as necessary
 import { useColorScheme } from '../hooks/useColorScheme'; // Adjust the path as necessary
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MAIN_SCREEN, SPLASH_SCREEN } from '@/constants/Routes';
+import { ActivityIndicator } from 'react-native';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -17,27 +19,26 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
   const { appIsReady, checkAuthStatus } = useAuthStore();
-  
+
   useEffect(() => {
     async function prepare() {
       try {
         const storedToken = await AsyncStorage.getItem('token');
         if (storedToken === null) {
-          router.replace('/splash');
-        } else{
+          router.replace(SPLASH_SCREEN);
+        } else {
           const isAuthenticated = await checkAuthStatus();
-          if(isAuthenticated) { 
-            router.replace('/main') 
+          if (isAuthenticated) { 
+            router.replace(MAIN_SCREEN);
           } else { 
-             await AsyncStorage.removeItem('token'); 
-             router.replace('/splash') 
+            await AsyncStorage.removeItem('token'); 
+            router.replace(SPLASH_SCREEN);
           }
         }
-        
       } catch (e) {
         console.warn(e);
-        router.replace('/splash')
-      }
+        router.replace(SPLASH_SCREEN);
+      } 
     }
     prepare();
   }, [checkAuthStatus]);
@@ -48,9 +49,7 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, appIsReady]);
 
-  if (!fontsLoaded || !appIsReady) {
-    return null;
-  }
+  
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>

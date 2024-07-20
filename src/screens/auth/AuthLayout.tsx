@@ -1,5 +1,6 @@
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedView } from '@/components/ThemedView';
+import { FORGOT_PASS_SCREEN } from '@/constants/Routes';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
@@ -66,7 +67,7 @@ const AuthLayoutComponent: React.FC<AuthLayout> = ({
           </ThemedView>
 
           <ThemedView style={styles.rememberView}>
-              <Pressable onPress={() => router.push('/auth/forgotpass')}>
+              <Pressable onPress={() => router.push(FORGOT_PASS_SCREEN)}>
                   {showText ? (
                   <Text style={styles.forgetText}>
                     Forgot Password ?

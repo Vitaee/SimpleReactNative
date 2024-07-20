@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
 import AuthLayoutComponent from './AuthLayout';
 import { useAuthStore } from '../../context/AuthStore'; // Adjust the path as necessary
+import { LOGIN_SCREEN, MAIN_SCREEN, REGISTER_SCREEN } from '@/constants/Routes';
 
 const LoginScreen: React.FC = () => {
   const login = useAuthStore((state) => state.login);
@@ -12,15 +13,14 @@ const LoginScreen: React.FC = () => {
   const handleLogin = async () => {
     try {
       const isLoginSucces = await login(email, password);
-      console.log(isLoginSucces, " login success mi")
-      isLoginSucces ? router.replace('/main') : router.replace('/auth/login')
+      isLoginSucces ? router.replace(MAIN_SCREEN) : router.replace(LOGIN_SCREEN)
     } catch (error) {
-      router.replace('/auth/login')
+      router.replace(LOGIN_SCREEN)
     }
   };
 
   const handleRegister = () => {
-    router.push('/auth/register');
+    router.push(REGISTER_SCREEN);
   };
 
   return (
