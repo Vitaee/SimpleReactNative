@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { useThemeColor } from '@/hooks/useThemeColor';
@@ -6,14 +6,22 @@ import { Ionicons } from '@expo/vector-icons';
 import { Product } from '../constants/ProductType';
 import { router } from 'expo-router';
 import { PRODUCT_DETAIL_SCREEN } from '@/constants/Routes';
+import { useProductStore } from '@/src/context/products/ProductStore';
+import { useProfileStore } from '@/src/context/profile/ProfileStore';
 
 interface ProductCardProps {
   product: Product;
 }
 
-const ProductCard:  React.FC<ProductCardProps> = memo(({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
   const cardBackgroundColor = useThemeColor({}, 'cardBackground');
   const cardTextColor = useThemeColor({}, 'cardText');
+
+  const { isProductLiked, likeOrUnlikeProduct } = useProductStore();
+
+  const user = useProfileStore((state) => state.user);
+  const fetchUserData = useProfileStore((state) => state.fetchUserData);
+
 
   const getImageUri = () => {
     if (Array.isArray(product.product_image)) {
@@ -29,9 +37,49 @@ const ProductCard:  React.FC<ProductCardProps> = memo(({ product }) => {
     const encodedProduct = encodeURIComponent(JSON.stringify(product));
     router.push(`${PRODUCT_DETAIL_SCREEN}?product=${encodedProduct}`);
   };
+
+  const handleLikePress = () => {
+    if(product.like_count > 0){
+      if (isProductLiked(product._id)  || product.like_count > 0 && isProductLikedByCurrentUser()){
+        product.events.map(event => {
+          if(event.event.text == undefined && event.event.user._id == user?.data.user._id){
+            likeOrUnlikeProduct(product._id, event._id)
+          }
+        });
+        return;
+      } else {
+        likeOrUnlikeProduct(product._id);
+        return;
+      }
+    } else {
+      likeOrUnlikeProduct(product._id);
+    }
+  };
+
+  const isProductLikedByCurrentUser = () => {
+    
+    if (user && user.data && user.data.user && product.events) {
+      return product.events.some(event => { 
+        if (event.event.user._id === user.data.user._id){
+          if(event.event.text === undefined) {
+            return true;
+          }
+        }
+        return false;
+        
+        });
+    }
+    return false;
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
+
+
   return (
     <TouchableOpacity style={[styles.card, { backgroundColor: cardBackgroundColor }]} onPress={handlePress}>
-      <Image source={{  uri: getImageUri() }} style={styles.image} />
+      <Image source={{ uri: getImageUri() }} style={styles.image} />
       <ThemedText style={[styles.title, { color: cardTextColor }]}>{product.product_name}</ThemedText>
       <View style={styles.ratingContainer}>
         <Ionicons name="star" size={16} color="#ffd700" />
@@ -39,8 +87,12 @@ const ProductCard:  React.FC<ProductCardProps> = memo(({ product }) => {
       </View>
       <ThemedText style={[styles.price, { color: cardTextColor }]}>{product.product_price} tl</ThemedText>
       <Text style={styles.discountedPrice}>{product.product_discount} tl</Text>
-      <TouchableOpacity style={styles.favoriteButton}>
-        <Ionicons name="heart-outline" size={24} color="#ff6347" />
+      <TouchableOpacity style={styles.favoriteButton} onPress={handleLikePress}>
+        {isProductLiked(product._id)  || product.like_count > 0 && isProductLikedByCurrentUser() ? (
+          <Ionicons name="heart-sharp" size={24} color="#ff6347" />
+        ) : (
+          <Ionicons name="heart-outline" size={24} color="#ff6347" />
+        )}
       </TouchableOpacity>
     </TouchableOpacity>
   );

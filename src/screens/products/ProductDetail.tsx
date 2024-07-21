@@ -18,7 +18,7 @@ const ProductDetail = () => {
     // Safely decode and parse the product data
     parsedProduct = JSON.parse(decodeURIComponent(encodeURIComponent(product))) ;
     parsedProduct as Product;
-    console.log(parsedProduct?.product_image.length);
+   
   } catch (error) {
     console.error('Failed to parse product data:', error);
     return (

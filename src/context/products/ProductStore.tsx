@@ -19,9 +19,12 @@ interface ProductState {
     fetchProducts: (pageNumber: number, brandId?: string, selectedCategory?: string) => Promise<void>;
     fetchSearchProducts: (searchQuery: string, pageNumber: number) => Promise<void>;
     fetchCategories: (brandId?: string) => Promise<void>;
+    likeOrUnlikeProduct: (productId: string, timelineEvent?: string) => Promise<void>;
+    isProductLiked: (productId: string) => boolean;
+    likedProducts: { [key: string]: boolean };
   }
   
-  export const useProductStore = create<ProductState>((set) => ({
+  export const useProductStore = create<ProductState>((set, get) => ({
     products: [],
     loading: false,
     error: null,
@@ -33,6 +36,7 @@ interface ProductState {
     categories: [],
     categoriesLoading: false,
     categoriesError: null,
+    likedProducts: {},
 
   fetchProducts: async (pageNumber, brandId, selectedCategory) => {
     set({ loading: true, error: null });
@@ -90,7 +94,7 @@ interface ProductState {
   fetchCategories: async (brandId) => {
     set({ categoriesLoading: true, categoriesError: null });
     try {
-      const response = await api.get(brandId ? `product/category/brand/${brandId}` : `/product/categories`);
+      const response = await api.get(brandId ? `/product/category/brand/${brandId}` : `/product/categories`);
       if (response.data.success) {
         const fetchedCategories: ProductCategory[] = [];
 
@@ -111,4 +115,27 @@ interface ProductState {
       set({ categoriesLoading: false, categoriesError: err });
     }
   },
+
+  likeOrUnlikeProduct: async (productId, timelineEvent?) => {
+    try {
+      const response = timelineEvent ?  await api.delete('product/event/', { product_id: productId, timeline_event: timelineEvent }) 
+      : await api.put('product/event/', { product_id: productId });
+      console.log(response.data);
+      if (response.status === 200) {
+        set((state) => ({
+          likedProducts: {
+            ...state.likedProducts,
+            [productId]: !state.likedProducts[productId],
+          },
+        }));
+      }
+    } catch (err) {
+      console.error('Error liking or unliking product:', err);
+    }
+  },
+
+  isProductLiked: (productId) => {
+    return !!get().likedProducts[productId];
+  },
+
 }));

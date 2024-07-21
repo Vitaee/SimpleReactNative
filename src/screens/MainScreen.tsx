@@ -25,7 +25,6 @@ export default function MainScreen() {
   }, [fetchBrands]);
 
   const handleBrandPress = (brandId: string, brandName: string) => {
-    console.log(brandName);
     router.replace({ pathname: PRODUCT_SCREEN, params: { brandId, brandName } });
   };
   
