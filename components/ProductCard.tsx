@@ -39,17 +39,15 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
   };
 
   const handleLikePress = () => {
-    if(product.like_count > 0){
-      if (isProductLiked(product._id)  || product.like_count > 0 && isProductLikedByCurrentUser()){
-        product.events.map(event => {
-          if(event.event.text == undefined && event.event.user._id == user?.data.user._id){
-            likeOrUnlikeProduct(product._id, event._id)
+    if (product.like_count > 0) {
+      if (isProductLiked(product._id) || isProductLikedByCurrentUser()) {
+        product.events.forEach((event) => {
+          if (event.event.user._id === user?.data.user._id) {
+            likeOrUnlikeProduct(product._id, event._id);
           }
         });
-        return;
       } else {
         likeOrUnlikeProduct(product._id);
-        return;
       }
     } else {
       likeOrUnlikeProduct(product._id);
@@ -57,17 +55,8 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
   };
 
   const isProductLikedByCurrentUser = () => {
-    
     if (user && user.data && user.data.user && product.events) {
-      return product.events.some(event => { 
-        if (event.event.user._id === user.data.user._id){
-          if(event.event.text === undefined) {
-            return true;
-          }
-        }
-        return false;
-        
-        });
+      return product.events.some((event) => event.event.user._id === user.data.user._id);
     }
     return false;
   };
@@ -88,7 +77,7 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
       <ThemedText style={[styles.price, { color: cardTextColor }]}>{product.product_price} tl</ThemedText>
       <Text style={styles.discountedPrice}>{product.product_discount} tl</Text>
       <TouchableOpacity style={styles.favoriteButton} onPress={handleLikePress}>
-        {isProductLiked(product._id)  || product.like_count > 0 && isProductLikedByCurrentUser() ? (
+        {isProductLiked(product._id) || isProductLikedByCurrentUser() ? (
           <Ionicons name="heart-sharp" size={24} color="#ff6347" />
         ) : (
           <Ionicons name="heart-outline" size={24} color="#ff6347" />

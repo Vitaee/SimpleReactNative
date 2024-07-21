@@ -116,11 +116,12 @@ interface ProductState {
     }
   },
 
-  likeOrUnlikeProduct: async (productId, timelineEvent?) => {
+  likeOrUnlikeProduct: async (productId, timelineEvent) => {
     try {
-      const response = timelineEvent ?  await api.delete('product/event/', { product_id: productId, timeline_event: timelineEvent }) 
-      : await api.put('product/event/', { product_id: productId });
-      console.log(response.data);
+      const response = timelineEvent
+        ? await api.delete('product/event/', { data: { timeline_event: timelineEvent, product_id: productId } })
+        : await api.put('product/event/', { product_id: productId });
+
       if (response.status === 200) {
         set((state) => ({
           likedProducts: {
