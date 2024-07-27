@@ -1,6 +1,6 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
+import * as Network from 'expo-network';
 
 //const API_BASE_URL = Platform.OS === 'ios' ? API_URL : API_URL;
 
@@ -16,7 +16,13 @@ api.interceptors.request.use(async (config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  const ip = await Network.getIpAddressAsync();
+  
+  config.headers['x-real-ip'] = ip;
+  
   return config;
+
 });
 
 export default api;
