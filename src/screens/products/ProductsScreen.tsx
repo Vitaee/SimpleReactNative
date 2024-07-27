@@ -21,8 +21,8 @@ const ProductsScreen: React.FC = () => {
   const navigation = useNavigation();
 
   const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const placeholderColor = useThemeColor({}, 'placeholderColor');
+  const textColor = useThemeColor({}, 'primaryText');
+  const placeholderColor = useThemeColor({}, 'secondaryText');
   const borderColor = useThemeColor({}, 'borderColor');
 
   const {

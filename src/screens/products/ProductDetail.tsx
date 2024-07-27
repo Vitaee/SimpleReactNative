@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/useThemeColor';
@@ -8,6 +8,8 @@ import { useRouter, useLocalSearchParams, useNavigation, router } from 'expo-rou
 import { ThemedView } from '@/components/ThemedView';
 import ImageGallery from '@/components/ImageGallery';
 import { WEBVIEW_SCREEN } from '@/constants/Routes';
+import ParallaxScrollView from '@/components/ParallaxScrollView';
+import Comments from '@/components/Comments';
 
 
 const ProductDetail = () => {
@@ -28,18 +30,17 @@ const ProductDetail = () => {
     );
   }
 
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const cardBackgroundColor = useThemeColor({}, 'cardBackground');
-  const cardTextColor = useThemeColor({}, 'cardText');
+  const [commentsCount, setCommentsCount] = useState(10);
 
-  const getImageUris = () => {
-    if (Array.isArray(parsedProduct?.product_image)) {
-      return parsedProduct?.product_image;
-    } else {
-      return [parsedProduct?.product_image];
-    }
+  const handlePostComment = (comment) => {
+    // Here you can make an API call to post the comment
+    console.log('Posting comment:', comment);
+    // Update the comments count or fetch the updated comments
+    setCommentsCount(prevCount => prevCount + 1);
   };
+
+  const cardBackgroundColor = useThemeColor({}, 'background');
+  const cardTextColor = useThemeColor({}, 'secondaryText');
 
   const navigation = useNavigation();
 
@@ -57,9 +58,9 @@ const ProductDetail = () => {
 
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor }]}>
+    <ParallaxScrollView>
       
-      <ImageGallery images={getImageUris()} />
+      <ImageGallery images={parsedProduct?.product_image} />
       <View style={[styles.detailsContainer, { backgroundColor: cardBackgroundColor }]}>
         <View style={styles.ratingContainer}>
           <Ionicons name="star" size={16} color="#ffd700" />
@@ -74,17 +75,11 @@ const ProductDetail = () => {
           <Text style={styles.discountedPrice}>{parsedProduct?.product_discount} tl</Text>
           <TouchableOpacity onPress={ () => {openWebView(parsedProduct?.product_link)}}><ThemedText type='subtitle'>Orjinal Link</ThemedText></TouchableOpacity>
         </View>
-        <View style={styles.commentsContainer}>
-          <Text style={[styles.commentsTitle, { color: textColor }]}>Yorumlar</Text>
-          {/* Render comments here */}
-          <Text style={[styles.commentCount, { color: textColor }]}>10</Text>
-        </View>
-        <TouchableOpacity style={[styles.commentInput, { borderColor: cardTextColor }]}>
-          <Ionicons name="chatbox-ellipses-outline" size={24} color={textColor} />
-          <Text style={[styles.commentPlaceholder, { color: textColor }]}>Yorumunuzu ekleyin...</Text>
-        </TouchableOpacity>
+
+        <Comments commentCount={commentsCount} onCommentSubmit={handlePostComment} />
+
       </View>
-    </ScrollView>
+    </ParallaxScrollView>
   );
 };
 

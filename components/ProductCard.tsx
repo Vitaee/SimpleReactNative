@@ -14,8 +14,8 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
-  const cardBackgroundColor = useThemeColor({}, 'cardBackground');
-  const cardTextColor = useThemeColor({}, 'cardText');
+  const cardBackgroundColor = useThemeColor({}, 'background');
+  const cardTextColor = useThemeColor({}, 'primaryText');
 
   const { isProductLiked, likeOrUnlikeProduct } = useProductStore();
 
@@ -68,6 +68,14 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
 
   return (
     <TouchableOpacity style={[styles.card, { backgroundColor: cardBackgroundColor }]} onPress={handlePress}>
+      <TouchableOpacity style={styles.favoriteButton} onPress={handleLikePress}>
+        {isProductLiked(product._id) || isProductLikedByCurrentUser() ? (
+          <Ionicons name="bookmark-sharp" size={24} color="#ff6347" />
+        ) : (
+          <Ionicons name="bookmark-outline" size={24} color="#ff6347" />
+        )}
+      </TouchableOpacity>
+
       <Image source={{ uri: getImageUri() }} style={styles.image} />
       <ThemedText style={[styles.title, { color: cardTextColor }]}>{product.product_name}</ThemedText>
       <View style={styles.ratingContainer}>
@@ -76,7 +84,7 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
       </View>
       <ThemedText style={[styles.price, { color: cardTextColor }]}>{product.product_price} tl</ThemedText>
       <Text style={styles.discountedPrice}>{product.product_discount} tl</Text>
-      <TouchableOpacity style={styles.favoriteButton} onPress={handleLikePress}>
+      <TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
         {isProductLiked(product._id) || isProductLikedByCurrentUser() ? (
           <Ionicons name="heart-sharp" size={24} color="#ff6347" />
         ) : (
@@ -131,10 +139,15 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
     marginBottom: 8,
   },
-  favoriteButton: {
+  likeButton: {
     position: 'absolute',
     top: 8,
     right: 8,
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
   },
 });
 

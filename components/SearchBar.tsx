@@ -11,7 +11,7 @@ interface SearchBarProps {
 
 const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, handleSearch  }) => {
   const borderColor = useThemeColor({}, 'borderColor');
-  const textColor = useThemeColor({}, 'text');
+  const textColor = useThemeColor({}, 'secondaryText');
   const placeholderColor = useThemeColor({}, 'background');
 
   const [showFilters, setShowFilters] = useState(false);

@@ -15,8 +15,8 @@ export default function MainScreen() {
   const error = useBrandStore((state) => state.error);
   const fetchBrands = useBrandStore((state) => state.fetchBrands);
   const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const cardBackgroundColor = useThemeColor({}, 'cardBackground');
+  const textColor = useThemeColor({}, 'primaryText');
+  const cardBackgroundColor = useThemeColor({}, 'background');
   const borderColor = useThemeColor({}, 'borderColor');
   const router = useRouter();
 
