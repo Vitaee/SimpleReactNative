@@ -17,7 +17,7 @@ const TimelineScreen = () => {
     const [showFilters, setShowFilters] = useState(false);
 
     const backgroundColor = useThemeColor({}, 'background');
-    const textColor = useThemeColor({}, 'text');
+    const textColor = useThemeColor({}, 'primaryText');
     const borderColor = useThemeColor({}, 'borderColor');
 
     const [timelineData, setTimelineData] = useState<TimelineData[]>([]);

@@ -7,7 +7,6 @@ import Animated, {
   useSharedValue,
   interpolate,
 } from 'react-native-reanimated';
-import { ThemedView } from '@/components/ThemedView';
 
 const ITEM_WIDTH = 100; // Adjust based on your item width
 const HEADER_HEIGHT = 200; // Adjust based on your header height

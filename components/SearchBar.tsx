@@ -11,8 +11,7 @@ interface SearchBarProps {
 
 const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, handleSearch  }) => {
   const borderColor = useThemeColor({}, 'borderColor');
-  const textColor = useThemeColor({}, 'secondaryText');
-  const placeholderColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'primaryText');
 
   const [showFilters, setShowFilters] = useState(false);
 
@@ -23,11 +22,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, handleSearch  }) => 
   return (
     <View style={styles.header}>
       <View style={[styles.searchContainer, { backgroundColor: borderColor }]}>
-        <Ionicons name="search" size={20} color={placeholderColor} style={styles.searchIcon} />
+        <Ionicons name="search" size={20} color={textColor} style={styles.searchIcon} />
         <TextInput
           style={[styles.searchBar, { color: textColor }]}
           placeholder="Ara"
-          placeholderTextColor={placeholderColor}
+          placeholderTextColor={textColor}
           value={searchQuery}
           onChangeText={handleSearch}
         />

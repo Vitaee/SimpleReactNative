@@ -6,12 +6,11 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { TimelineData, TimelineEvent } from '@/constants/TimelineType';
+import ParallaxScrollView from '@/components/ParallaxScrollView';
 
 const TimelineDetailScreen = () => {
-  const router = useRouter();
   const { data } = useLocalSearchParams();
-  const textColor = useThemeColor({}, 'text');
-  const placeholderColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'primaryText');
   const borderColor = useThemeColor({}, 'borderColor');
 
   let parsedData: TimelineData | null = null;
@@ -25,7 +24,7 @@ const TimelineDetailScreen = () => {
 
   return (
     <ThemedView style={styles.container}>
-      <ScrollView>
+      <ParallaxScrollView>
 
         <ThemedText type="title" style={styles.productName}>{parsedData!.product.product_name}</ThemedText>
         <ThemedText style={styles.productDescription}>{parsedData!.description}</ThemedText>
@@ -75,7 +74,7 @@ const TimelineDetailScreen = () => {
             </View>
           </View>
         ))}
-      </ScrollView>
+      </ParallaxScrollView>
     </ThemedView>
   );
 };

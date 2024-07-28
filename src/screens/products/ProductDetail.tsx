@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import {  ThemedText } from '../../../components/ThemedText'; // Adjust the path according to your project structure
+import {  ThemedText } from '../../../components/ThemedText'; 
 import { Product } from '../../../constants/ProductType';
 import { useRouter, useLocalSearchParams, useNavigation, router } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
@@ -48,6 +48,18 @@ const ProductDetail = () => {
     router.push({ pathname: WEBVIEW_SCREEN, params: { url: url }});
   };
 
+  const displayDiscount = (discount: string | undefined) => {
+    if (isNaN(Number(discount))){
+      return null;
+    }
+
+    if(discount != "0"  ){
+      return discount + " TL";
+    }
+
+    return null;
+  }
+
   useEffect(() => {
     if (parsedProduct?.product_name) {
       navigation.setOptions({
@@ -58,28 +70,34 @@ const ProductDetail = () => {
 
 
   return (
-    <ParallaxScrollView>
-      
-      <ImageGallery images={parsedProduct?.product_image} />
-      <View style={[styles.detailsContainer, { backgroundColor: cardBackgroundColor }]}>
-        <View style={styles.ratingContainer}>
-          <Ionicons name="star" size={16} color="#ffd700" />
-          <Text style={[styles.rating, { color: cardTextColor }]}>4.5</Text>
-        </View>
-        <ThemedText style={[styles.title, { color: cardTextColor }]}>{parsedProduct?.product_name}</ThemedText>
-        <Text style={[styles.description, { color: cardTextColor }]}>
-          {parsedProduct?.product_description}
-        </Text>
-        <View style={styles.priceContainer}>
-          <ThemedText style={[styles.price, { color: cardTextColor }]}>{parsedProduct?.product_price} tl</ThemedText>
-          <Text style={styles.discountedPrice}>{parsedProduct?.product_discount} tl</Text>
-          <TouchableOpacity onPress={ () => {openWebView(parsedProduct?.product_link)}}><ThemedText type='subtitle'>Orjinal Link</ThemedText></TouchableOpacity>
-        </View>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.select({ ios: 100, android: 70 })}
+    >
+      <ParallaxScrollView>
+        
+        <ImageGallery images={parsedProduct?.product_image} />
+        <View style={[styles.detailsContainer, { backgroundColor: cardBackgroundColor }]}>
+          <View style={styles.ratingContainer}>
+            <Ionicons name="star" size={16} color="#ffd700" />
+            <Text style={[styles.rating, { color: cardTextColor }]}>4.5</Text>
+          </View>
+          <ThemedText style={[styles.title, { color: cardTextColor }]}>{parsedProduct?.product_name}</ThemedText>
+          <Text style={[styles.description, { color: cardTextColor }]}>
+            {parsedProduct?.product_description}
+          </Text>
+          <View style={styles.priceContainer}>
+            <ThemedText style={[styles.price, { color: cardTextColor }]}>{parsedProduct?.product_price} tl</ThemedText>
+            <Text style={styles.discountedPrice}> {displayDiscount(parsedProduct?.product_discount) }</Text>
+            <TouchableOpacity onPress={ () => {openWebView(parsedProduct?.product_link)}}><ThemedText type='subtitle'>Orjinal Link</ThemedText></TouchableOpacity>
+          </View>
 
-        <Comments commentCount={commentsCount} onCommentSubmit={handlePostComment} />
+          <Comments commentCount={commentsCount} onCommentSubmit={handlePostComment} />
 
-      </View>
-    </ParallaxScrollView>
+        </View>
+      </ParallaxScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

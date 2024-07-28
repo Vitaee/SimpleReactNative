@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { TextInput, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, View, ScrollView, Modal } from 'react-native';
+import React, { useEffect, useState, useCallback, memo } from 'react';
+import { TextInput, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, View, Modal } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import ProductCard from '../../../components/ProductCard';
@@ -14,7 +14,6 @@ const ProductsScreen: React.FC = () => {
   const ITEM_HEIGHT = 200;
   const [pageNumber, setPageNumber] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('');
 
   const { brandId, brandName } = useLocalSearchParams();
@@ -22,8 +21,6 @@ const ProductsScreen: React.FC = () => {
 
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'primaryText');
-  const placeholderColor = useThemeColor({}, 'secondaryText');
-  const borderColor = useThemeColor({}, 'borderColor');
 
   const {
     products,
@@ -63,18 +60,18 @@ const ProductsScreen: React.FC = () => {
     }
   }, [pageNumber, searchQuery, selectedCategory, brandId]);
 
-  const handleSearch = (text: string) => {
+  const handleSearch = useCallback((text: string) => {
     setSearchQuery(text);
     setPageNumber(1);
-  };
+  }, []);
 
-  const handleCategoryChange = (categoryText: string) => {
+  const handleCategoryChange = useCallback((categoryText: string) => {
     setSearchQuery('');
     setPageNumber(1);
     setSelectedCategory(categoryText);
-  };
+  }, []);
 
-  const loadMoreProducts = () => {
+  const loadMoreProducts = useCallback(() => {
     if (searchQuery) {
       if (searchPagination && pageNumber < searchPagination.number_of_page) {
         setPageNumber((prev) => prev + 1);
@@ -84,7 +81,7 @@ const ProductsScreen: React.FC = () => {
         setPageNumber((prev) => prev + 1);
       }
     }
-  };
+  }, [searchQuery, pagination, searchPagination, pageNumber]);
 
   return (
     <ThemedView style={[styles.container, { backgroundColor }]}>
@@ -139,6 +136,7 @@ const ProductsScreen: React.FC = () => {
             columnWrapperStyle={styles.row}
             onEndReached={loadMoreProducts}
             onEndReachedThreshold={0.5}
+            maxToRenderPerBatch={10}
             ListFooterComponent={searchLoading && pageNumber > 1 ? <ActivityIndicator size="small" color={textColor} /> : null}
             getItemLayout={(data, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })}
           />
@@ -153,6 +151,7 @@ const ProductsScreen: React.FC = () => {
           columnWrapperStyle={styles.row}
           onEndReached={loadMoreProducts}
           onEndReachedThreshold={0.5}
+          maxToRenderPerBatch={10}
           ListFooterComponent={loading && pageNumber > 1 ? <ActivityIndicator size="small" color={textColor} /> : null}
           getItemLayout={(data, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })}
         />
@@ -160,6 +159,7 @@ const ProductsScreen: React.FC = () => {
     </ThemedView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -246,4 +246,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProductsScreen;
+export default memo(ProductsScreen);

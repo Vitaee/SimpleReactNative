@@ -8,6 +8,7 @@ import { router } from 'expo-router';
 import { PRODUCT_DETAIL_SCREEN } from '@/constants/Routes';
 import { useProductStore } from '@/src/context/products/ProductStore';
 import { useProfileStore } from '@/src/context/profile/ProfileStore';
+import { useFavsStore } from '@/src/context/profile/FavouritesStore';
 
 interface ProductCardProps {
   product: Product;
@@ -17,21 +18,10 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
   const cardBackgroundColor = useThemeColor({}, 'background');
   const cardTextColor = useThemeColor({}, 'primaryText');
 
-  const { isProductLiked, likeOrUnlikeProduct } = useProductStore();
+  const { isProductLiked, likeOrUnlikeProduct, isProductFaved, addOrRemoveProductToFavs, initializeFavedProducts } = useProductStore();
 
   const user = useProfileStore((state) => state.user);
-  const fetchUserData = useProfileStore((state) => state.fetchUserData);
-
-
-  const getImageUri = () => {
-    if (Array.isArray(product.product_image)) {
-      // Use the first image if product_image is an array
-      return product.product_image[0];
-    } else {
-      // Otherwise, product_image is a single URI string
-      return product.product_image;
-    }
-  };
+  const userFavs = useFavsStore((state) => state.favs);
 
   const handlePress = () => {
     const encodedProduct = encodeURIComponent(JSON.stringify(product));
@@ -54,29 +44,42 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
     }
   };
 
-  const isProductLikedByCurrentUser = () => {
-    if (user && user.data && user.data.user && product.events) {
-      return product.events.some((event) => event.event.user._id === user.data.user._id);
+  const handleFavPress = (product_id: string) => {
+    const userFavsProducts = userFavs?.data[0].product!;
+
+
+    if ( userFavsProducts != undefined) {
+      if (isProductFaved(product_id)) {
+
+         addOrRemoveProductToFavs(product_id, "remove");
+
+      } else {
+        addOrRemoveProductToFavs(product_id, "add");
+      }
+    } else {
+      addOrRemoveProductToFavs(product_id, "add");
     }
-    return false;
   };
 
+  
+
+
   useEffect(() => {
-    fetchUserData();
-  }, [fetchUserData]);
+    initializeFavedProducts();
+  }, [initializeFavedProducts]);
 
 
   return (
     <TouchableOpacity style={[styles.card, { backgroundColor: cardBackgroundColor }]} onPress={handlePress}>
-      <TouchableOpacity style={styles.favoriteButton} onPress={handleLikePress}>
-        {isProductLiked(product._id) || isProductLikedByCurrentUser() ? (
+      <TouchableOpacity style={styles.favoriteButton} onPress={() => handleFavPress(product._id)}>
+        {isProductFaved(product._id)  ? (
           <Ionicons name="bookmark-sharp" size={24} color="#ff6347" />
         ) : (
           <Ionicons name="bookmark-outline" size={24} color="#ff6347" />
         )}
       </TouchableOpacity>
 
-      <Image source={{ uri: getImageUri() }} style={styles.image} />
+      <Image source={{ uri: product.product_image[0] }} style={styles.image} />
       <ThemedText style={[styles.title, { color: cardTextColor }]}>{product.product_name}</ThemedText>
       <View style={styles.ratingContainer}>
         <Ionicons name="star" size={16} color="#ffd700" />
@@ -85,7 +88,7 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
       <ThemedText style={[styles.price, { color: cardTextColor }]}>{product.product_price} tl</ThemedText>
       <Text style={styles.discountedPrice}>{product.product_discount} tl</Text>
       <TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
-        {isProductLiked(product._id) || isProductLikedByCurrentUser() ? (
+        {isProductLiked(product._id)  ? (
           <Ionicons name="heart-sharp" size={24} color="#ff6347" />
         ) : (
           <Ionicons name="heart-outline" size={24} color="#ff6347" />
