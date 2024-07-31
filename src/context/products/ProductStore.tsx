@@ -2,8 +2,6 @@ import { create } from 'zustand';
 import api from '../../services/api'; // Ensure to import your api instance
 import { Pagination, Product } from '@/constants/ProductType';
 import { ProductCategory } from '@/constants/ProductCategoriesType';
-import { FavsApiDeleteRequest, FavsApiResponse } from '@/constants/FavsType';
-import { useFavsStore } from '../profile/FavouritesStore';
 
 
 interface ProductState {
@@ -26,8 +24,6 @@ interface ProductState {
     likedProducts: { [key: string]: boolean };
     addOrRemoveProductToFavs: (productId: string, type: string) => Promise<void>;
     favedProducts: { [key: string]: boolean };
-    isProductFaved: (productId: string) => boolean;
-    initializeFavedProducts: () => Promise<void>;
   }
   
   export const useProductStore = create<ProductState>((set, get) => ({
@@ -147,30 +143,6 @@ interface ProductState {
 
   isProductLiked: (productId) => {
     return !!get().likedProducts[productId];
-  },
-
-  isProductFaved: (productId) => {
-    return !!get().favedProducts[productId];
-  },
-
-  initializeFavedProducts: async () => {
-    const { fetchUserFavs } = useFavsStore.getState();
-
-    await fetchUserFavs();
-
-    const { favs } = useFavsStore.getState();
-
-    if (!favs || favs.data.length === 0) {
-      set({ favedProducts: {} });
-      return;
-    }
-
-    const newFavedProducts = (favs?.data[0].product ?? []).reduce((acc, fav) => {
-      acc[fav._id] = true;
-      return acc;
-    }, {});
-
-    set({ favedProducts: newFavedProducts });
   },
 
   addOrRemoveProductToFavs: async (productId, type) => {

@@ -9,13 +9,14 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import SearchBar from '@/components/SearchBar';
 import { useProductStore } from '../../context/products/ProductStore';
+import { useFavsStore } from '@/src/context/profile/FavouritesStore';
 
 const ProductsScreen: React.FC = () => {
   const ITEM_HEIGHT = 200;
   const [pageNumber, setPageNumber] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-
+  
   const { brandId, brandName } = useLocalSearchParams();
   const navigation = useNavigation();
 
@@ -39,7 +40,11 @@ const ProductsScreen: React.FC = () => {
     fetchCategories,
   } = useProductStore();
 
+  const userFavs = useFavsStore( (state) => state.fetchUserFavs);
+  const favs = useFavsStore( (state) => state.favs)
+
   useEffect(() => {
+    userFavs();
     if (brandId) {
       navigation.setOptions({
         title: `${brandName} Ürünleri`,
@@ -130,7 +135,7 @@ const ProductsScreen: React.FC = () => {
           <FlatList
             data={searchProducts}
             keyExtractor={(item, index) => `${item._id}-${index}`}
-            renderItem={({ item }) => <ProductCard product={item} />}
+            renderItem={({ item }) => <ProductCard product={item} favProducts={favs?.data[0]?.product.map(product => product._id) || []} />}
             initialNumToRender={6}
             numColumns={2}
             columnWrapperStyle={styles.row}
@@ -145,7 +150,7 @@ const ProductsScreen: React.FC = () => {
         <FlatList
           data={products}
           keyExtractor={(item, index) => `${item._id}-${index}`}
-          renderItem={({ item }) => <ProductCard product={item} />}
+          renderItem={({ item }) => <ProductCard product={item} favProducts={favs?.data[0]?.product.map(product => product._id) || []} />}
           initialNumToRender={6}
           numColumns={2}
           columnWrapperStyle={styles.row}

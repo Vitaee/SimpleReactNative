@@ -11,6 +11,7 @@ import { UserApiResponse } from '@/constants/UserType';
 import { SPLASH_SCREEN } from '@/constants/Routes';
 import { useProfileStore } from '@/src/context/profile/ProfileStore';
 import ImagePickerComponent from '@/components/ImagePicker';
+import { useFavsStore } from '@/src/context/profile/FavouritesStore';
 
 
 
@@ -19,6 +20,10 @@ const ProfileScreen = () => {
   const loading = useProfileStore((state) => state.loading);
   const error = useProfileStore((state) => state.error);
   const fetchUserData = useProfileStore((state) => state.fetchUserData);
+
+  const favs = useFavsStore((state) => state.favs);
+  const fetUserFavs = useFavsStore((state) => state.fetchUserFavs);
+
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
 
@@ -35,7 +40,8 @@ const ProfileScreen = () => {
 
   useEffect(() => {
     fetchUserData();
-  }, [fetchUserData]);
+    fetUserFavs();
+  }, [fetchUserData, fetUserFavs]);
 
   const handleImagePicked = (uri: string) => {
     setProfileImage(uri);
@@ -92,7 +98,7 @@ const ProfileScreen = () => {
             </View>
             <View style={styles.stat}>
               <Ionicons name="chatbubble-outline" size={16} color="gray" />
-              <ThemedText>10</ThemedText>
+              <ThemedText>2</ThemedText>
             </View>
           </View>
         </View>        

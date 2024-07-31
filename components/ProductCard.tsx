@@ -12,16 +12,16 @@ import { useFavsStore } from '@/src/context/profile/FavouritesStore';
 
 interface ProductCardProps {
   product: Product;
+  favProducts: string[] | []
 }
 
-const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = memo(({ product, favProducts = [] }) => {
   const cardBackgroundColor = useThemeColor({}, 'background');
   const cardTextColor = useThemeColor({}, 'primaryText');
 
-  const { isProductLiked, likeOrUnlikeProduct, isProductFaved, addOrRemoveProductToFavs, initializeFavedProducts } = useProductStore();
+  const { isProductLiked, likeOrUnlikeProduct, addOrRemoveProductToFavs, favedProducts } = useProductStore();
 
   const user = useProfileStore((state) => state.user);
-  const userFavs = useFavsStore((state) => state.favs);
 
   const handlePress = () => {
     const encodedProduct = encodeURIComponent(JSON.stringify(product));
@@ -30,7 +30,7 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
 
   const handleLikePress = () => {
     if (product.like_count > 0) {
-      if (isProductLiked(product._id) || isProductLikedByCurrentUser()) {
+      if (isProductLiked(product._id)) {
         product.events.forEach((event) => {
           if (event.event.user._id === user?.data.user._id) {
             likeOrUnlikeProduct(product._id, event._id);
@@ -44,35 +44,26 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
     }
   };
 
-  const handleFavPress = (product_id: string) => {
-    const userFavsProducts = userFavs?.data[0].product!;
+  const isProductFaved = favProducts.includes(product._id);
 
-
-    if ( userFavsProducts != undefined) {
-      if (isProductFaved(product_id)) {
-
-         addOrRemoveProductToFavs(product_id, "remove");
-
-      } else {
-        addOrRemoveProductToFavs(product_id, "add");
-      }
+  const handleFavPress = () => {
+    console.log(isProductFaved);
+    
+    if (isProductFaved) {
+      // Remove from favProducts and update globally
+      addOrRemoveProductToFavs(product._id, "remove");
     } else {
-      addOrRemoveProductToFavs(product_id, "add");
+      // Add to favProducts and update globally
+      addOrRemoveProductToFavs(product._id, "add");
     }
   };
 
-  
-
-
-  useEffect(() => {
-    initializeFavedProducts();
-  }, [initializeFavedProducts]);
-
+ 
 
   return (
     <TouchableOpacity style={[styles.card, { backgroundColor: cardBackgroundColor }]} onPress={handlePress}>
-      <TouchableOpacity style={styles.favoriteButton} onPress={() => handleFavPress(product._id)}>
-        {isProductFaved(product._id)  ? (
+      <TouchableOpacity style={styles.favoriteButton} onPress={() => handleFavPress()}>
+        {favProducts.some(favProduct => favProduct === product._id) || favedProducts[product._id]   ? (
           <Ionicons name="bookmark-sharp" size={24} color="#ff6347" />
         ) : (
           <Ionicons name="bookmark-outline" size={24} color="#ff6347" />
