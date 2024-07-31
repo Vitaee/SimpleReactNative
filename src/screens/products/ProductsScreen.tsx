@@ -16,7 +16,7 @@ const ProductsScreen: React.FC = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  
+
   const { brandId, brandName } = useLocalSearchParams();
   const navigation = useNavigation();
 
@@ -40,8 +40,8 @@ const ProductsScreen: React.FC = () => {
     fetchCategories,
   } = useProductStore();
 
-  const userFavs = useFavsStore( (state) => state.fetchUserFavs);
-  const favs = useFavsStore( (state) => state.favs)
+  const userFavs = useFavsStore((state) => state.fetchUserFavs);
+  const favs = useFavsStore((state) => state.favs);
 
   useEffect(() => {
     userFavs();
@@ -104,18 +104,18 @@ const ProductsScreen: React.FC = () => {
         ) : categoriesError ? (
           <ThemedText style={{ color: textColor }}>Error loading product categories</ThemedText>
         ) : (
-          categories.map(category => (
+          categories.map((category) => (
             <TouchableOpacity
-              key={category.id}
+              key={`${category.id}_${Math.random()}`}
               style={[
                 styles.categoryButton,
-                selectedCategory === category.id && styles.selectedCategory
+                selectedCategory === category.id && styles.selectedCategory,
               ]}
-              onPress={() => handleCategoryChange(category.name)}
+              onPress={() => handleCategoryChange(category.product_category)}
             >
               <Ionicons name="apps-outline" size={24} color={textColor} />
               <ThemedText style={styles.categoryText}>
-                {category.name.length > 15 ? category.name.substring(0, 12) + '...' : category.name}
+                {category.product_category.length > 15 ? `${category.product_category.substring(0, 12)}...` : category.product_category}
               </ThemedText>
             </TouchableOpacity>
           ))
@@ -135,14 +135,21 @@ const ProductsScreen: React.FC = () => {
           <FlatList
             data={searchProducts}
             keyExtractor={(item, index) => `${item._id}-${index}`}
-            renderItem={({ item }) => <ProductCard product={item} favProducts={favs?.data[0]?.product.map(product => product._id) || []} />}
+            renderItem={({ item }) => (
+              <ProductCard
+                product={item}
+                favProducts={favs?.data[0]?.product.map((product) => product._id) || []}
+              />
+            )}
             initialNumToRender={6}
             numColumns={2}
             columnWrapperStyle={styles.row}
             onEndReached={loadMoreProducts}
             onEndReachedThreshold={0.5}
             maxToRenderPerBatch={10}
-            ListFooterComponent={searchLoading && pageNumber > 1 ? <ActivityIndicator size="small" color={textColor} /> : null}
+            ListFooterComponent={
+              searchLoading && pageNumber > 1 ? <ActivityIndicator size="small" color={textColor} /> : null
+            }
             getItemLayout={(data, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })}
           />
         )
@@ -150,21 +157,27 @@ const ProductsScreen: React.FC = () => {
         <FlatList
           data={products}
           keyExtractor={(item, index) => `${item._id}-${index}`}
-          renderItem={({ item }) => <ProductCard product={item} favProducts={favs?.data[0]?.product.map(product => product._id) || []} />}
+          renderItem={({ item }) => (
+            <ProductCard
+              product={item}
+              favProducts={favs?.data[0]?.product.map((product) => product._id) || []}
+            />
+          )}
           initialNumToRender={6}
           numColumns={2}
           columnWrapperStyle={styles.row}
           onEndReached={loadMoreProducts}
           onEndReachedThreshold={0.5}
           maxToRenderPerBatch={10}
-          ListFooterComponent={loading && pageNumber > 1 ? <ActivityIndicator size="small" color={textColor} /> : null}
+          ListFooterComponent={
+            loading && pageNumber > 1 ? <ActivityIndicator size="small" color={textColor} /> : null
+          }
           getItemLayout={(data, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })}
         />
       )}
     </ThemedView>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {

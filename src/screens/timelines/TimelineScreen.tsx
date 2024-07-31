@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -10,80 +10,100 @@ import { TimelineApiResponse, TimelineData } from '@/constants/TimelineType';
 import SearchBar from '@/components/SearchBar';
 import { useRouter } from 'expo-router';
 import { TIMELINE_DETAIL_SCREEN } from '@/constants/Routes';
+import { useTimelineStore } from '@/src/context/timeline/TimelineStore';
 
 const TimelineScreen = () => {
-    const [pageNumber, setPageNumber] = useState(1);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
-    const backgroundColor = useThemeColor({}, 'background');
-    const textColor = useThemeColor({}, 'primaryText');
-    const borderColor = useThemeColor({}, 'borderColor');
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'primaryText');
+  const borderColor = useThemeColor({}, 'borderColor');
 
-    const [timelineData, setTimelineData] = useState<TimelineData[]>([]);
+  const router = useRouter();
 
-    const router = useRouter();
+  const timeline = useTimelineStore((state) => state.timeline);
+  const loading = useTimelineStore((state) => state.loading);
+  const error = useTimelineStore((state) => state.error);
+  const pageNumber = useTimelineStore((state) => state.pageNumber);
+  const totalPages = useTimelineStore((state) => state.totalPages);
+  const fetchTimelines = useTimelineStore((state) => state.fetchTimelines);
 
+  const handleSearch = (text: string) => {
+    setSearchQuery(text);
+    fetchTimelines(1, text); // Fetch the first page with search query
+  };
 
-    useEffect(() => {
-        const fetchTimelineData = async () => {
-        try {
-            const response = await api.get<TimelineApiResponse>('/timeline/');
-            if (response.data.success) {
-            setTimelineData(response.data.data);
-            }
-        } catch (error) {
-            console.error(error);
-        }
-        };
+  const handleItemPress = (item: TimelineData) => {
+    router.push({
+      pathname: TIMELINE_DETAIL_SCREEN,
+      params: {
+        data: JSON.stringify(item),
+      },
+    });
+  };
 
-        fetchTimelineData();
-    }, []);
+  const loadMore = () => {
+    if (pageNumber < totalPages && !loading) {
+      fetchTimelines(pageNumber + 1, searchQuery); // Fetch the next page
+    }
+  };
 
-    const handleSearch = (text: string) => {
-        setSearchQuery(text);
-        setPageNumber(1);
-    };
+  useEffect(() => {
+    fetchTimelines(); // Fetch the initial page
+  }, []);
 
-    const handleItemPress = (item: TimelineData) => {
+  const renderFooter = () => {
+    if (!loading) return null;
+    return <ActivityIndicator size="large" color={textColor} />;
+  };
 
-        router.push({
-          pathname: TIMELINE_DETAIL_SCREEN,
-          params: {
-            data: JSON.stringify(item)
-          }
-        });
-      };
-
-    return (
-        <ThemedView style={[styles.container, { backgroundColor }]}>
-            <SearchBar
-            searchQuery={searchQuery}
-            handleSearch={handleSearch}
-        />
-        <ParallaxScrollView>
-            {timelineData.map((item) => (
-            <TouchableOpacity key={item._id} style={[styles.card, { borderColor }]} onPress={() => handleItemPress(item)}>
-                <Image source={{ uri: item.image[0] }} style={styles.productImage} />
-                <View style={styles.productInfo}>
-                <ThemedText style={[styles.productName, { color: textColor }]}>{item.product.product_name}</ThemedText>
-                <ThemedText style={[styles.productDescription, { color: textColor }]}>{item.description}</ThemedText>
+  return (
+    <ThemedView style={[styles.container, { backgroundColor }]}>
+      <SearchBar searchQuery={searchQuery} handleSearch={handleSearch} />
+      {error ? (
+        <ThemedText type="title">{error}</ThemedText>
+      ) : (
+        <FlatList
+          data={timeline}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              key={item._id}
+              style={[styles.card, { borderColor }]}
+              onPress={() => handleItemPress(item)}
+            >
+              <Image source={{ uri: item.image[0] }} style={styles.productImage} />
+              <View style={styles.productInfo}>
+                <ThemedText style={[styles.productName, { color: textColor }]}>
+                  {item.product.product_name}
+                </ThemedText>
+                <ThemedText style={[styles.productDescription, { color: textColor }]}>
+                  {item.description}
+                </ThemedText>
                 <View style={styles.actions}>
-                    <TouchableOpacity style={styles.actionButton}>
+                  <TouchableOpacity style={styles.actionButton}>
                     <Ionicons name="heart-outline" size={20} color={textColor} />
-                    <ThemedText style={[styles.actionText, { color: textColor }]}>{item.like_count}</ThemedText>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionButton}>
+                    <ThemedText style={[styles.actionText, { color: textColor }]}>
+                      {item.like_count}
+                    </ThemedText>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.actionButton}>
                     <Ionicons name="chatbubble-outline" size={20} color={textColor} />
-                    <ThemedText style={[styles.actionText, { color: textColor }]}>{item.comment_count}</ThemedText>
-                    </TouchableOpacity>
+                    <ThemedText style={[styles.actionText, { color: textColor }]}>
+                      {item.comment_count}
+                    </ThemedText>
+                  </TouchableOpacity>
                 </View>
-                </View>
+              </View>
             </TouchableOpacity>
-            ))}
-        </ParallaxScrollView>
-        </ThemedView>
-    );
+          )}
+          ListFooterComponent={renderFooter}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+        />
+      )}
+    </ThemedView>
+  );
 };
 
 const styles = StyleSheet.create({

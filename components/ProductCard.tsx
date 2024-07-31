@@ -8,7 +8,12 @@ import { router } from 'expo-router';
 import { PRODUCT_DETAIL_SCREEN } from '@/constants/Routes';
 import { useProductStore } from '@/src/context/products/ProductStore';
 import { useProfileStore } from '@/src/context/profile/ProfileStore';
-import { useFavsStore } from '@/src/context/profile/FavouritesStore';
+import Animated, {
+  useSharedValue,
+  withTiming,
+  useAnimatedStyle,
+  Easing,
+} from 'react-native-reanimated';
 
 interface ProductCardProps {
   product: Product;
@@ -28,6 +33,39 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product, favProducts = [
     router.push(`${PRODUCT_DETAIL_SCREEN}?product=${encodedProduct}`);
   };
 
+
+  const scale = useSharedValue(1);
+  const heartScale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: scale.value }],
+    };
+  });
+
+  const animatedHeartStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: heartScale.value }],
+    };
+  });
+
+  
+
+  const triggerFavAnimation = () => {
+    scale.value = withTiming(1.2, { duration: 150, easing: Easing.out(Easing.ease) }, () => {
+      scale.value = withTiming(1, { duration: 150, easing: Easing.out(Easing.ease) });
+    });
+    handleFavPress();
+  };
+
+  const triggerLikeAnimation = () => {
+    heartScale.value = withTiming(1.2, { duration: 150, easing: Easing.out(Easing.ease) }, () => {
+      heartScale.value = withTiming(1, { duration: 150, easing: Easing.out(Easing.ease) });
+    });
+    handleLikePress();
+  };
+
+
   const handleLikePress = () => {
     if (product.like_count > 0) {
       if (isProductLiked(product._id)) {
@@ -44,16 +82,16 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product, favProducts = [
     }
   };
 
-  const isProductFaved = favProducts.includes(product._id);
+  const isProductFaved = favProducts.includes(product._id) || favedProducts[product._id];
 
   const handleFavPress = () => {
     console.log(isProductFaved);
     
     if (isProductFaved) {
-      // Remove from favProducts and update globally
+      favProducts = favProducts.filter((favProduct) => favProduct !== product._id);
       addOrRemoveProductToFavs(product._id, "remove");
     } else {
-      // Add to favProducts and update globally
+      favProducts.push(product._id);
       addOrRemoveProductToFavs(product._id, "add");
     }
   };
@@ -62,13 +100,15 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product, favProducts = [
 
   return (
     <TouchableOpacity style={[styles.card, { backgroundColor: cardBackgroundColor }]} onPress={handlePress}>
-      <TouchableOpacity style={styles.favoriteButton} onPress={() => handleFavPress()}>
-        {favProducts.some(favProduct => favProduct === product._id) || favedProducts[product._id]   ? (
-          <Ionicons name="bookmark-sharp" size={24} color="#ff6347" />
-        ) : (
-          <Ionicons name="bookmark-outline" size={24} color="#ff6347" />
-        )}
-      </TouchableOpacity>
+      <Animated.View style={[styles.favoriteButton, animatedStyle]}>
+        <TouchableOpacity style={styles.favoriteButton} onPress={() => triggerFavAnimation()}>
+          {favProducts.includes(product._id) || favedProducts[product._id]   ? (
+            <Ionicons name="bookmark-sharp" size={24} color="#ff6347" />
+          ) : (
+            <Ionicons name="bookmark-outline" size={24} color="#ff6347" />
+          )}
+        </TouchableOpacity>
+      </Animated.View>
 
       <Image source={{ uri: product.product_image[0] }} style={styles.image} />
       <ThemedText style={[styles.title, { color: cardTextColor }]}>{product.product_name}</ThemedText>
@@ -78,13 +118,15 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product, favProducts = [
       </View>
       <ThemedText style={[styles.price, { color: cardTextColor }]}>{product.product_price} tl</ThemedText>
       <Text style={styles.discountedPrice}>{product.product_discount} tl</Text>
-      <TouchableOpacity style={styles.likeButton} onPress={handleLikePress}>
-        {isProductLiked(product._id)  ? (
-          <Ionicons name="heart-sharp" size={24} color="#ff6347" />
-        ) : (
-          <Ionicons name="heart-outline" size={24} color="#ff6347" />
-        )}
-      </TouchableOpacity>
+      <Animated.View style={[styles.likeButton, animatedHeartStyle]}>
+        <TouchableOpacity style={styles.likeButton} onPress={triggerLikeAnimation}>
+          {isProductLiked(product._id)  ? (
+            <Ionicons name="heart-sharp" size={24} color="#ff6347" />
+          ) : (
+            <Ionicons name="heart-outline" size={24} color="#ff6347" />
+          )}
+        </TouchableOpacity>
+      </Animated.View>
     </TouchableOpacity>
   );
 });
@@ -135,12 +177,12 @@ const styles = StyleSheet.create({
   },
   likeButton: {
     position: 'absolute',
-    top: 8,
+    top: 7,
     right: 8,
   },
   favoriteButton: {
     position: 'absolute',
-    top: 8,
+    top: 7,
     left: 8,
   },
 });
