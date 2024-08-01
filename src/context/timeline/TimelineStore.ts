@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import api from '../../services/api'; // Ensure to import your api instance
 import { TimelineApiResponse, TimelineData } from '@/constants/TimelineType';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 interface TimelineState {
@@ -11,10 +10,10 @@ interface TimelineState {
     fetchTimelines: (page?: number, searchQuery?: string) => Promise<void>;
     pageNumber: number;
     totalPages: number;
-    likeOrUnlikeTimline: (timelineId: string, type: string) => { };
+    likeOrUnlikeTimeline: (timelineId: string, type: string, timeline_event?: string) => Promise<void>;
 }
 
-export const useTimelineStore = create<TimelineState>((set) => ({
+export const useTimelineStore = create<TimelineState>((set, get) => ({
     timeline: [],
     loading: true,
     error: null,
@@ -43,7 +42,29 @@ export const useTimelineStore = create<TimelineState>((set) => ({
         }
     },
 
-    // type: like or unlike
-    likeOrUnlikeTimline: async (timelineId: string, type: string = "like") => { },
+    likeOrUnlikeTimeline: async (timelineId: string, type: string, timeline_event?: string) => {
+        const timeline = get().timeline;
+        const index = timeline.findIndex((item) => item._id === timelineId);
+        if (index === -1) return;
+    
+        try {
+          const response = type == "like" ? await api.put(`/timeline/event/`, { timeline_id: timelineId, text: ""}) : 
+          await api.delete(`/timeline/event/`, { data: { timeline_id: timelineId, timeline_event: ""} });
+
+          if (response.status === 200) {
+            const updatedItem = {
+              ...timeline[index],
+              like_count: type === 'like' ? timeline[index].like_count + 1 : timeline[index].like_count - 1,
+            };
+            const updatedTimeline = [...timeline];
+            updatedTimeline[index] = updatedItem;
+            set({ timeline: updatedTimeline });
+          } else {
+            console.error('Failed to like/unlike timeline item');
+          }
+        } catch (error) {
+          console.error('Error liking/unliking timeline item:', error);
+        }
+      },
 
 }));

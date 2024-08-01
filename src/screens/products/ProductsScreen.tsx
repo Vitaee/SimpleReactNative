@@ -59,7 +59,11 @@ const ProductsScreen: React.FC = () => {
 
   useEffect(() => {
     if (searchQuery) {
-      fetchSearchProducts(searchQuery, pageNumber);
+      if (brandId) {
+        fetchSearchProducts(searchQuery, pageNumber, brandId?.toString());
+      } else {
+        fetchSearchProducts(searchQuery, pageNumber);
+      }
     } else {
       fetchProducts(pageNumber, brandId?.toString(), selectedCategory);
     }

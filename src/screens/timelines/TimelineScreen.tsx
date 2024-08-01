@@ -3,9 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIn
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import api from '../../services/api';
 import { useThemeColor } from '../../../hooks/useThemeColor';
-import ParallaxScrollView from '../../../components/ParallaxScrollView';
 import { TimelineApiResponse, TimelineData } from '@/constants/TimelineType';
 import SearchBar from '@/components/SearchBar';
 import { useRouter } from 'expo-router';
@@ -27,6 +25,8 @@ const TimelineScreen = () => {
   const pageNumber = useTimelineStore((state) => state.pageNumber);
   const totalPages = useTimelineStore((state) => state.totalPages);
   const fetchTimelines = useTimelineStore((state) => state.fetchTimelines);
+  const likeOrUnlikeTimeline = useTimelineStore((state) => state.likeOrUnlikeTimeline);
+
 
   const handleSearch = (text: string) => {
     setSearchQuery(text);
@@ -40,6 +40,12 @@ const TimelineScreen = () => {
         data: JSON.stringify(item),
       },
     });
+  };
+
+  const handleLikePress = async (item: TimelineData) => {
+    let type = "";
+    item.events.map((m => {m.event.user._id == '' })) ? 'unlike' : 'like';
+    await likeOrUnlikeTimeline(item._id, type, "0");
   };
 
   const loadMore = () => {
@@ -81,18 +87,13 @@ const TimelineScreen = () => {
                   {item.description}
                 </ThemedText>
                 <View style={styles.actions}>
-                  <TouchableOpacity style={styles.actionButton}>
-                    <Ionicons name="heart-outline" size={20} color={textColor} />
+                  <TouchableOpacity style={styles.actionButton} onPress={() => {handleLikePress(item)}}>
+                    <Ionicons name={item.events ? "heart" : "heart-outline"} size={20} color={textColor}  />
                     <ThemedText style={[styles.actionText, { color: textColor }]}>
                       {item.like_count}
                     </ThemedText>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.actionButton}>
-                    <Ionicons name="chatbubble-outline" size={20} color={textColor} />
-                    <ThemedText style={[styles.actionText, { color: textColor }]}>
-                      {item.comment_count}
-                    </ThemedText>
-                  </TouchableOpacity>
+                
                 </View>
               </View>
             </TouchableOpacity>

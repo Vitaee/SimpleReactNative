@@ -17,7 +17,7 @@ interface ProductState {
     categoriesLoading: boolean;
     categoriesError: Error | null | unknown;
     fetchProducts: (pageNumber: number, brandId?: string, selectedCategory?: string) => Promise<void>;
-    fetchSearchProducts: (searchQuery: string, pageNumber: number) => Promise<void>;
+    fetchSearchProducts: (searchQuery: string, pageNumber: number, brandId?: string) => Promise<void>;
     fetchCategories: (brandId?: string) => Promise<void>;
     likeOrUnlikeProduct: (productId: string, timelineEvent?: string) => Promise<void>;
     isProductLiked: (productId: string) => boolean;
@@ -73,11 +73,16 @@ interface ProductState {
       }
     },
   
-    fetchSearchProducts: async (searchQuery, pageNumber) => {
+    fetchSearchProducts: async (searchQuery, pageNumber, brandId: string = "") => {
       set({ searchLoading: true, searchError: null });
       try {
-        const response = await api.get('/product/search', {
-          params: { query: searchQuery, page: pageNumber },
+        let postBody: object = { product_name: searchQuery };
+        if (brandId) {
+          postBody = { product_brand_id: brandId, product_name: searchQuery };
+        }
+
+        const response = await api.post('/product/search/', postBody , {
+          params: { page: pageNumber },
         });
   
         set((state) => ({
@@ -87,6 +92,7 @@ interface ProductState {
         }));
       } catch (err) {
         console.error('Error searching products:', err);
+        
         set({ searchLoading: false, searchError: err!.toString() });
       }
     },
