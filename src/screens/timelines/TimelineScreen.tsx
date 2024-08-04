@@ -103,6 +103,9 @@ const TimelineScreen = () => {
           onEndReachedThreshold={0.5}
         />
       )}
+      <TouchableOpacity onPress={() => { router.push('/forms/form') }}>
+        <ThemedText type='title'> Bir şeyler Paylaş </ThemedText>
+      </TouchableOpacity>
     </ThemedView>
   );
 };
