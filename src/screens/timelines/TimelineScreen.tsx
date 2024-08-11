@@ -78,10 +78,10 @@ const TimelineScreen = () => {
               style={[styles.card, { borderColor }]}
               onPress={() => handleItemPress(item)}
             >
-              <Image source={{ uri: item.image[0] }} style={styles.productImage} />
+              <Image source={{ uri: item.image[0] ?? item.product.product_image[0] }} style={styles.productImage} />
               <View style={styles.productInfo}>
                 <ThemedText style={[styles.productName, { color: textColor }]}>
-                  {item.product.product_name}
+                  {item.title}
                 </ThemedText>
                 <ThemedText style={[styles.productDescription, { color: textColor }]}>
                   {item.description}

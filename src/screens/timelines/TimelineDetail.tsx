@@ -7,6 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { TimelineData, TimelineEvent } from '@/constants/TimelineType';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
+import Comments from '@/components/Comments';
 
 const TimelineDetailScreen = () => {
   const { data } = useLocalSearchParams();
@@ -26,7 +27,7 @@ const TimelineDetailScreen = () => {
     <ThemedView style={styles.container}>
       <ParallaxScrollView>
 
-        <ThemedText type="title" style={styles.productName}>{parsedData!.product.product_name}</ThemedText>
+        <ThemedText type="title" style={styles.productName}>{parsedData!.title}</ThemedText>
         <ThemedText style={styles.productDescription}>{parsedData!.description}</ThemedText>
         <Image source={{ uri: parsedData!.image[0] }} style={styles.productImage} />
 
@@ -47,18 +48,6 @@ const TimelineDetailScreen = () => {
           <ThemedText style={styles.postDate}>{parsedData!.createdAt}</ThemedText>
         </View>
 
-        <View style={[styles.productCard, { borderColor }]}>
-          <Image source={{ uri: parsedData!.product.product_image[0] }} style={styles.productImage} />
-          <View style={styles.productDetails}>
-            <ThemedText style={styles.productTitle}>Ürün</ThemedText>
-            <ThemedText style={styles.productSubtitle}>{parsedData?.product.product_name}</ThemedText>
-            <View style={styles.productRating}>
-              <Ionicons name="star" size={16} color="#FFD700" />
-              <ThemedText style={styles.productRatingText}>{3.4}</ThemedText>
-            </View>
-          </View>
-        </View>
-
         <ThemedText style={styles.commentSectionTitle}>Yorumlar</ThemedText>
         {parsedData!.events && parsedData!.events.map((comment: TimelineEvent, index: number) => (
           <View key={index} style={styles.commentContainer}>
@@ -74,6 +63,9 @@ const TimelineDetailScreen = () => {
             </View>
           </View>
         ))}
+
+        <Comments commentCount={1} onCommentSubmit={() => {}} />
+
       </ParallaxScrollView>
     </ThemedView>
   );

@@ -32,7 +32,7 @@ const ProductDetail = () => {
 
   const [commentsCount, setCommentsCount] = useState(10);
 
-  const handlePostComment = (comment) => {
+  const handlePostComment = (comment: string) => {
     // Here you can make an API call to post the comment
     console.log('Posting comment:', comment);
     // Update the comments count or fetch the updated comments

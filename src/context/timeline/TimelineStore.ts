@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import api from '../../services/api'; // Ensure to import your api instance
-import { TimelineApiResponse, TimelineData } from '@/constants/TimelineType';
+import { TimelineApiResponse, TimelineData, TimelineFormData } from '@/constants/TimelineType';
 
 
 interface TimelineState {
@@ -10,7 +10,10 @@ interface TimelineState {
     fetchTimelines: (page?: number, searchQuery?: string) => Promise<void>;
     pageNumber: number;
     totalPages: number;
+    createTimeline: (data: TimelineFormData) => Promise<void>;
+    timelineCreated?: boolean;
     likeOrUnlikeTimeline: (timelineId: string, type: string, timeline_event?: string) => Promise<void>;
+
 }
 
 export const useTimelineStore = create<TimelineState>((set, get) => ({
@@ -19,6 +22,7 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
     error: null,
     pageNumber: 1,
     totalPages: 1,
+    timelineCreated: false,
   
     fetchTimelines: async (page = 1, searchQuery = '') => {
         try {
@@ -42,6 +46,40 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
         }
     },
 
+    createTimeline: async (data: TimelineFormData) => {
+      try {
+        set({ loading: true });
+        const formData = new FormData();
+        formData.append('description', data.description);
+        formData.append('title', data.title);
+  
+        // Append images if they exist
+        if (data.image) {
+          data.image.forEach((uri, index) => {
+            const filename = uri.split('/').pop();
+            const match = /\.(\w+)$/.exec(filename ?? '');
+            const type = match ? `image/${match[1]}` : `image`;
+            formData.append('images', { uri, name: filename, type } as any);
+          });
+        }
+  
+        const response = await api.post('/timeline', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+  
+        if (response.status === 200) {
+          set((state) => ({
+            timelineCreated: true,
+            loading: false,
+          }));
+        } else {
+          set({  timelineCreated: false, loading: false, error: 'Failed to create timeline' });
+        }
+      } catch (error) {
+        console.error('Error creating timeline:', error);
+        set({ timelineCreated: false, loading: false, error: 'Failed to create timeline' });
+      }
+    },
     likeOrUnlikeTimeline: async (timelineId: string, type: string, timeline_event?: string) => {
         const timeline = get().timeline;
         const index = timeline.findIndex((item) => item._id === timelineId);

@@ -3,7 +3,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { FORGOT_PASS_SCREEN } from '@/constants/Routes';
 import { router } from 'expo-router';
 import React from 'react';
-import { Alert, Button, Image, Pressable, SafeAreaView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Alert, Button, Image, KeyboardAvoidingView, Platform, Pressable, SafeAreaView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 
 const logo = require("../../../assets/images/icon.png");
 
@@ -37,58 +37,64 @@ const AuthLayoutComponent: React.FC<AuthLayout> = ({
   showText
 }) => {
   return (
-    <ParallaxScrollView contentContainerStyle={styles.scrollContent}>
-      <ThemedView style={styles.container}>
-          <Image source={logo} style={styles.image} resizeMode='cover' />
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.select({ ios: 50, android: 70 })}
+    >
+      <ParallaxScrollView contentContainerStyle={styles.scrollContent}>
+          <ThemedView style={styles.container}>
+            <Image source={logo} style={styles.image} resizeMode='cover' />
 
-          <Text style={styles.title}>{title}</Text>
+            <Text style={styles.title}>{title}</Text>
 
-          <ThemedView style={styles.inputView}>
-            <TextInput
-              style={styles.input}
-              placeholder={emailPlaceHolder}
-              value={email}
-              onChangeText={setEmail}
-              autoCorrect={false}
-              autoCapitalize='none'
-            />
-            {password !== null ?             
-            <TextInput
-              style={styles.input}
-              placeholder='Password'
-              secureTextEntry
-              value={password!}
-              onChangeText={setPassword}
-              autoCorrect={false}
-              autoCapitalize='none'
-            /> : null}
+            <ThemedView style={styles.inputView}>
+              <TextInput
+                style={styles.input}
+                placeholder={emailPlaceHolder}
+                value={email}
+                onChangeText={setEmail}
+                autoCorrect={false}
+                autoCapitalize='none'
+              />
+              {password !== null ?             
+              <TextInput
+                style={styles.input}
+                placeholder='Password'
+                secureTextEntry
+                value={password!}
+                onChangeText={setPassword}
+                autoCorrect={false}
+                autoCapitalize='none'
+              /> : null}
 
-          </ThemedView>
+            </ThemedView>
 
-          <ThemedView style={styles.rememberView}>
-              <Pressable onPress={() => router.push(FORGOT_PASS_SCREEN)}>
-                  {showText ? (
-                  <Text style={styles.forgetText}>
-                    Forgot Password ?
-                  </Text> ) : ( null )
-                  }
+            <ThemedView style={styles.rememberView}>
+                <Pressable onPress={() => router.push(FORGOT_PASS_SCREEN)}>
+                    {showText ? (
+                    <Text style={styles.forgetText}>
+                      Forgot Password ?
+                    </Text> ) : ( null )
+                    }
+                </Pressable>
+            </ThemedView>
+
+            <ThemedView style={styles.buttonView}>
+              <Pressable style={styles.button} onPress={handleSubmit}>
+                <Text style={styles.buttonText}>{submitText}</Text>
               </Pressable>
-          </ThemedView>
+            </ThemedView>
 
-          <ThemedView style={styles.buttonView}>
-            <Pressable style={styles.button} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>{submitText}</Text>
-            </Pressable>
+            <Text style={styles.footerText}>
+              {footerText}
+              <Pressable onPress={onFooterActionPress}>
+                <Text style={styles.signup}> {footerActionText}</Text>
+              </Pressable>
+            </Text>
           </ThemedView>
-
-          <Text style={styles.footerText}>
-            {footerText}
-            <Pressable onPress={onFooterActionPress}>
-              <Text style={styles.signup}> {footerActionText}</Text>
-            </Pressable>
-          </Text>
-        </ThemedView>
       </ParallaxScrollView>
+    </KeyboardAvoidingView>
 
   );
 };

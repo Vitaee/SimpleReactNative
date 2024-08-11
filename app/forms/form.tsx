@@ -1,3 +1,3 @@
-import FormProductSelection from "@/components/timelineForm/formProductSelection";
+import FormDetails from "@/components/timelineForm/formDetails";
 
-export default FormProductSelection;
+export default FormDetails;

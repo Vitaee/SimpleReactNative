@@ -34,6 +34,7 @@ export interface Product {
 export interface TimelineData {
   _id: string;
   product: Product;
+  title: string;
   description: string;
   image: string[];
   events: TimelineEvent[];
@@ -57,3 +58,9 @@ export interface TimelineApiResponse {
   data: TimelineData[];
   pagination: PaginationInfo;
 }
+
+export interface TimelineFormData  {
+  description: string;
+  image?: string[];
+  title: string;
+};

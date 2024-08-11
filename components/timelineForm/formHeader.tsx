@@ -21,7 +21,7 @@ const FormHeader: React.FC<HeaderProps> = ({ title, subTitle, step }) => {
       <ThemedText style={styles.title} type='subtitle'>{subTitle}</ThemedText>
 
       <ThemedView style={styles.stepsContainer}>
-        {[1, 2, 3].map((num) => (
+        {[1, 2].map((num) => (
           <ThemedView
             key={num}
             style={[
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   },
   stepsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
   },
   step: {
     width: 30,
