@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Image, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
@@ -23,51 +23,65 @@ const TimelineDetailScreen = () => {
     }
   }
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+  
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  };
+
   return (
-    <ThemedView style={styles.container}>
-      <ParallaxScrollView>
+    <KeyboardAvoidingView
+    style={{ flex: 1 }}
+    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    keyboardVerticalOffset={Platform.select({ ios: 100, android: 70 })}
+    >
+      <ThemedView style={styles.container}>
+        <ParallaxScrollView>
 
-        <ThemedText type="title" style={styles.productName}>{parsedData!.title}</ThemedText>
-        <ThemedText style={styles.productDescription}>{parsedData!.description}</ThemedText>
-        <Image source={{ uri: parsedData!.image[0] }} style={styles.productImage} />
+          
+        <ThemedView style={styles.userContainer}>
+            <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/2202/2202112.png' }} style={styles.userAvatar} />
+            <ThemedView style={styles.userInfo}>
+              <ThemedText style={styles.userName}>{parsedData?.user.email}</ThemedText>
+              
+            </ThemedView>
+            <ThemedText style={styles.postDate}>{formatDate(parsedData!.createdAt)}</ThemedText>
+          </ThemedView>
 
 
-        <View style={styles.tags}>
-          <ThemedText style={[styles.tag, { color: textColor }]}>#ruj</ThemedText>
-        </View>
+          <ThemedText type="title" style={styles.productName}>{parsedData!.title}</ThemedText>
 
-        <View style={styles.userContainer}>
-          <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/2202/2202112.png' }} style={styles.userAvatar} />
-          <View style={styles.userInfo}>
-            <ThemedText style={styles.userName}>{parsedData?.user.email}</ThemedText>
-            <View style={styles.userRating}>
-              <Ionicons name="star" size={16} color="#FFD700" />
-              <ThemedText style={styles.userRatingText}>4.2</ThemedText>
-            </View>
-          </View>
-          <ThemedText style={styles.postDate}>{parsedData!.createdAt}</ThemedText>
-        </View>
+          <ThemedText style={styles.productDescription}>{parsedData!.description}</ThemedText>
+          <Image source={{ uri: parsedData!.image[0] }} style={styles.productImage} />
 
-        <ThemedText style={styles.commentSectionTitle}>Yorumlar</ThemedText>
-        {parsedData!.events && parsedData!.events.map((comment: TimelineEvent, index: number) => (
-          <View key={index} style={styles.commentContainer}>
-            <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }} style={styles.commentAvatar} />
-            <View style={styles.commentContent}>
-              <ThemedText style={styles.commentUserName}>{comment.event.user.email}</ThemedText>
-              <ThemedText style={styles.commentText}>{comment.event.text}</ThemedText>
-              <View style={styles.commentRating}>
-                <Ionicons name="star" size={16} color="#FFD700" />
-                <ThemedText style={styles.commentRatingText}>1.4</ThemedText>
+        
+
+          <ThemedText style={styles.commentSectionTitle}>Yorumlar</ThemedText>
+          {parsedData!.events && parsedData!.events.map((comment: TimelineEvent, index: number) => (
+            <View key={index} style={styles.commentContainer}>
+              <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }} style={styles.commentAvatar} />
+              <View style={styles.commentContent}>
+                <ThemedText style={styles.commentUserName}>{comment.event.user.email}</ThemedText>
+                <ThemedText style={styles.commentText}>{comment.event.text}</ThemedText>
+                <View style={styles.commentRating}>
+                  <Ionicons name="star" size={16} color="#FFD700" />
+                  <ThemedText style={styles.commentRatingText}>1.4</ThemedText>
+                </View>
+                <ThemedText style={styles.commentDate}>{comment.createdAt}</ThemedText>
               </View>
-              <ThemedText style={styles.commentDate}>{comment.createdAt}</ThemedText>
             </View>
-          </View>
-        ))}
+          ))}
 
-        <Comments commentCount={1} onCommentSubmit={() => {}} />
+          <Comments commentCount={1} onCommentSubmit={() => {}} />
 
-      </ParallaxScrollView>
-    </ThemedView>
+        </ParallaxScrollView>
+      </ThemedView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -143,8 +157,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   productImage: {
-    width: 60,
-    height: 60,
+    width: 340,
+    height: 340,
     borderRadius: 10,
   },
   productDetails: {
@@ -170,6 +184,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    marginTop: 18
   },
   commentContainer: {
     flexDirection: 'row',

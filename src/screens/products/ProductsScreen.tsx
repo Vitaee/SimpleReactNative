@@ -117,7 +117,7 @@ const ProductsScreen: React.FC = () => {
               ]}
               onPress={() => handleCategoryChange(category.product_category)}
             >
-              <Ionicons name="apps-outline" size={24} color={textColor} />
+              
               <ThemedText style={styles.categoryText}>
                 {category.product_category.length > 15 ? `${category.product_category.substring(0, 12)}...` : category.product_category}
               </ThemedText>
@@ -202,11 +202,18 @@ const styles = StyleSheet.create({
   },
   selectedCategory: {
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    borderColor: 'purple',
+    color: 'purple',
   },
   categoryText: {
     marginTop: 5,
     fontSize: 12,
     textAlign: 'center',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 8,
+    padding: 8,
+    color: '#E0E0E0',
   },
   row: {
     flex: 1,

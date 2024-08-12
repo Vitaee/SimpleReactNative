@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -12,6 +12,8 @@ import { useTimelineStore } from '@/src/context/timeline/TimelineStore';
 
 const TimelineScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
 
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'primaryText');
@@ -54,8 +56,14 @@ const TimelineScreen = () => {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchTimelines(1, searchQuery);
+    setRefreshing(false);
+  };
+
   useEffect(() => {
-    fetchTimelines(); // Fetch the initial page
+    fetchTimelines(); 
   }, []);
 
   const renderFooter = () => {
@@ -64,7 +72,7 @@ const TimelineScreen = () => {
   };
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor }]}>
+    <ThemedView style={styles.container}>
       <SearchBar searchQuery={searchQuery} handleSearch={handleSearch} />
       {error ? (
         <ThemedText type="title">{error}</ThemedText>
@@ -73,34 +81,45 @@ const TimelineScreen = () => {
           data={timeline}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              key={item._id}
-              style={[styles.card, { borderColor }]}
-              onPress={() => handleItemPress(item)}
-            >
-              <Image source={{ uri: item.image[0] ?? item.product.product_image[0] }} style={styles.productImage} />
-              <View style={styles.productInfo}>
-                <ThemedText style={[styles.productName, { color: textColor }]}>
-                  {item.title}
-                </ThemedText>
-                <ThemedText style={[styles.productDescription, { color: textColor }]}>
-                  {item.description}
-                </ThemedText>
-                <View style={styles.actions}>
-                  <TouchableOpacity style={styles.actionButton} onPress={() => {handleLikePress(item)}}>
-                    <Ionicons name={item.events ? "heart" : "heart-outline"} size={20} color={textColor}  />
-                    <ThemedText style={[styles.actionText, { color: textColor }]}>
-                      {item.like_count}
-                    </ThemedText>
-                  </TouchableOpacity>
-                
-                </View>
-              </View>
+            <TouchableOpacity key={item._id} style={styles.card} onPress={() => handleItemPress(item)}>
+              <Image source={{ uri: "https://www.pinclipart.com/picdir/middle/541-5416602_dummy-profile-image-url-clipart.png" }} style={styles.profileImage} />
+              <ThemedView style={styles.content}>
+                  <ThemedView style={styles.header}>
+                    <ThemedText style={styles.userName}>{item.user.email}</ThemedText>
+                    <ThemedText style={styles.timestamp}>{formatDate(item.createdAt)}</ThemedText>
+                  </ThemedView>
+                  <ThemedText style={styles.postText}>{item.description}</ThemedText>
+                  {item.image[0] || item.product.product_image[0] ? (
+                    <Image source={{ uri: item.image[0] ?? item.product.product_image[0] }} style={styles.postImage} />
+                  ) : null}
+                  <ThemedView style={styles.actions}>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => handleLikePress(item)}>
+                      <Ionicons name={item.events ? "heart" : "heart-outline"} size={20} color="#666" />
+                      <ThemedText style={styles.actionText}>{item.like_count}</ThemedText>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => handleLikePress(item)}>
+                      <Ionicons name={item.events ? "bookmark" : "bookmark-outline"} size={20} color="#666" />
+                      <ThemedText style={styles.actionText}>{item.like_count}</ThemedText>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => handleLikePress(item)}>
+                      <Ionicons name={item.events ? "chatbubble": "chatbubble-outline"} size={20} color="#666" />
+                      <ThemedText style={styles.actionText}>{item.like_count}</ThemedText>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => handleLikePress(item)}>
+                      <Ionicons name={item.events ? "share": "share-outline"} size={20} color="#666" />
+                      <ThemedText style={styles.actionText}>{item.like_count}</ThemedText>
+                    </TouchableOpacity>
+                    {/* Add more action buttons like comment and share here */}
+                  </ThemedView>
+              </ThemedView>
             </TouchableOpacity>
           )}
           ListFooterComponent={renderFooter}
           onEndReached={loadMore}
           onEndReachedThreshold={0.5}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={textColor} />
+          }
         />
       )}
       <TouchableOpacity onPress={() => { router.push('/forms/form') }}>
@@ -110,33 +129,57 @@ const TimelineScreen = () => {
   );
 };
 
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const isPM = hours >= 12;
+  const formattedTime = `${hours % 12 || 12}:${minutes < 10 ? '0' + minutes : minutes} ${isPM ? 'PM' : 'AM'}`;
+
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${formattedTime}`;
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   card: {
     flexDirection: 'row',
-    borderWidth: 1,
-    borderRadius: 8,
-    margin: 10,
-    padding: 10,
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e1e8ed',
   },
-  productImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
   },
-  productInfo: {
+  content: {
     flex: 1,
-    marginLeft: 10,
   },
-  productName: {
-    fontSize: 16,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  userName: {
     fontWeight: 'bold',
+    fontSize: 16,
   },
-  productDescription: {
-    fontSize: 14,
+  timestamp: {
+    color: '#657786',
+    fontSize: 12,
+  },
+  postText: {
     marginTop: 5,
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  postImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginTop: 10,
   },
   actions: {
     flexDirection: 'row',
@@ -149,6 +192,7 @@ const styles = StyleSheet.create({
   },
   actionText: {
     marginLeft: 5,
+    color: '#666',
     fontSize: 14,
   },
 });
