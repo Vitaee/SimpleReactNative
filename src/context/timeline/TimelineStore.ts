@@ -86,7 +86,7 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
         if (index === -1) return;
     
         try {
-          const response = type == "like" ? await api.put(`/timeline/event/`, { timeline_id: timelineId, text: ""}) : 
+          const response = type == "like" ? await api.put(`/timeline/event/`, { data: { timeline_id: timelineId, text: ""} }) : 
           await api.delete(`/timeline/event/`, { data: { timeline_id: timelineId, timeline_event: ""} });
 
           if (response.status === 200) {

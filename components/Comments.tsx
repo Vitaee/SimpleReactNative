@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, Keyboard, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from './ThemedView';
 
 
 const CommentSection = ({ commentCount, onCommentSubmit }) => {
@@ -18,13 +19,7 @@ const CommentSection = ({ commentCount, onCommentSubmit }) => {
   };
 
   return (
-    <View style={styles.commentsContainer}>
-      <ThemedText style={styles.commentsTitle} type="title">
-        Yorumlar
-      </ThemedText>
-      <ThemedText style={styles.commentCount} type="default">
-        {commentCount}
-      </ThemedText>
+    <ThemedView style={styles.commentsContainer}>
       <TouchableOpacity
         style={[styles.commentInput, isInputFocused && { borderColor: '#FF6B6B' }]}
         onPress={() => setInputFocused(true)}
@@ -40,7 +35,7 @@ const CommentSection = ({ commentCount, onCommentSubmit }) => {
           onBlur={() => setInputFocused(false)}
         />
       </TouchableOpacity>
-    </View>
+    </ThemedView>
   );
 };
 

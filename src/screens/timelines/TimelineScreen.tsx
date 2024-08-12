@@ -9,6 +9,7 @@ import SearchBar from '@/components/SearchBar';
 import { useRouter } from 'expo-router';
 import { TIMELINE_DETAIL_SCREEN } from '@/constants/Routes';
 import { useTimelineStore } from '@/src/context/timeline/TimelineStore';
+import { formatDate } from '@/src/services/utils';
 
 const TimelineScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -129,15 +130,7 @@ const TimelineScreen = () => {
   );
 };
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-  const isPM = hours >= 12;
-  const formattedTime = `${hours % 12 || 12}:${minutes < 10 ? '0' + minutes : minutes} ${isPM ? 'PM' : 'AM'}`;
 
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${formattedTime}`;
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -146,8 +139,8 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e1e8ed',
+    borderBottomWidth: 0.2,
+    borderBottomColor: 'gray',
   },
   profileImage: {
     width: 50,

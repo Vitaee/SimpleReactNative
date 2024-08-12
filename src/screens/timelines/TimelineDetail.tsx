@@ -60,24 +60,24 @@ const TimelineDetailScreen = () => {
           <Image source={{ uri: parsedData!.image[0] }} style={styles.productImage} />
 
         
+          <Comments commentCount={1} onCommentSubmit={() => {}} />
 
-          <ThemedText style={styles.commentSectionTitle}>Yorumlar</ThemedText>
+          <ThemedText style={styles.commentSectionTitle}>Yorumlar ( {parsedData!.comment_count} ) adet</ThemedText>
           {parsedData!.events && parsedData!.events.map((comment: TimelineEvent, index: number) => (
-            <View key={index} style={styles.commentContainer}>
+            comment.event.text != null && comment.event.text != "" ?
+            <ThemedView key={index} style={styles.commentContainer}>
               <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }} style={styles.commentAvatar} />
-              <View style={styles.commentContent}>
+              <ThemedView style={styles.commentContent}>
                 <ThemedText style={styles.commentUserName}>{comment.event.user.email}</ThemedText>
-                <ThemedText style={styles.commentText}>{comment.event.text}</ThemedText>
-                <View style={styles.commentRating}>
-                  <Ionicons name="star" size={16} color="#FFD700" />
-                  <ThemedText style={styles.commentRatingText}>1.4</ThemedText>
-                </View>
-                <ThemedText style={styles.commentDate}>{comment.createdAt}</ThemedText>
-              </View>
-            </View>
+                <ThemedText style={styles.commentDate}>{formatDate(comment.createdAt)}</ThemedText>
+
+                <ThemedText style={styles.commentText}>Test yorum</ThemedText>
+                
+              </ThemedView>
+            </ThemedView>
+            : null
           ))}
 
-          <Comments commentCount={1} onCommentSubmit={() => {}} />
 
         </ParallaxScrollView>
       </ThemedView>
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   commentUserName: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   commentText: {
