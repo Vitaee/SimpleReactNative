@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     borderRadius: 8,
-    padding: 16,
+    padding: 18,
     margin: 8,
     shadowColor: '#000',
     shadowOpacity: 0.1,
@@ -145,8 +145,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    width: 60,
-    height: 60,
+    width: 120,
+    height: 120,
     marginBottom: 8,
   },
   title: {

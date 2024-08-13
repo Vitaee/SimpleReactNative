@@ -123,8 +123,8 @@ const TimelineScreen = () => {
           }
         />
       )}
-      <TouchableOpacity onPress={() => { router.push('/forms/form') }}>
-        <ThemedText type='title'> Bir şeyler Paylaş </ThemedText>
+      <TouchableOpacity onPress={() => { router.push('/forms/form') }} style={{width:60, height:60, borderRadius:20, backgroundColor: "transparent"}}>
+        <Ionicons name='add-circle' size={60} color="#1DA1F2" />
       </TouchableOpacity>
     </ThemedView>
   );

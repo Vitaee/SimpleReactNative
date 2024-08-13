@@ -84,6 +84,8 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
         const timeline = get().timeline;
         const index = timeline.findIndex((item) => item._id === timelineId);
         if (index === -1) return;
+        console.log("index", index);
+        console.log("timeline", timeline);
     
         try {
           const response = type == "like" ? await api.put(`/timeline/event/`, { data: { timeline_id: timelineId, text: ""} }) : 

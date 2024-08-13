@@ -62,7 +62,7 @@ const ProfileScreen = () => {
         <ThemedText style={styles.profileName}>Joe Doe</ThemedText>
         <ThemedText type='subtitle' style={styles.profileName}>{user?.data.user.email}</ThemedText>
 
-        <TouchableOpacity style={styles.editButton}>
+        <TouchableOpacity style={styles.editButton} onPress={() => {router.push('/profile/editprofile')}}>
           <Ionicons name="create-outline" size={24} color="purple" />
         </TouchableOpacity>
 

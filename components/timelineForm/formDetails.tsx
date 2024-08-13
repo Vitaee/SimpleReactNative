@@ -26,6 +26,16 @@ const FormDetails: React.FC = () => {
     setFormData({ ...formData, image: [...(formData.image || []), imageUri] });
   };
 
+  const handleRemoveImage = (index: number) => {
+    const updatedImages = [...selectedImages];
+    updatedImages.splice(index, 1);
+    setSelectedImages(updatedImages);
+
+    const updatedFormImages = formData.image ? [...formData.image] : [];
+    updatedFormImages.splice(index, 1);
+    setFormData({ ...formData, image: updatedFormImages });
+  };
+
   useEffect(() => {
     if (timelineCreated) {
       console.log('Timeline created successfully');
@@ -66,7 +76,12 @@ const FormDetails: React.FC = () => {
         {selectedImages.length > 0 && (
           <ThemedView style={styles.imagePreviewContainer}>
             {selectedImages.map((imageUri, index) => (
-              <Image key={index} source={{ uri: imageUri }} style={styles.imagePreview} />
+              <View key={index} style={styles.imageWrapper}>
+                <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+                <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveImage(index)}>
+                  <Ionicons name="close-circle" size={24} color="red" />
+                </TouchableOpacity>
+              </View>
             ))}
           </ThemedView>
         )}
@@ -118,6 +133,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0F0F0',
     padding: 12,
     borderRadius: 8,
+    width: 190,
+    height: 50,
   },
   uploadButtonText: {
     marginLeft: 8,
@@ -139,6 +156,16 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginBottom: 4,
   
+  },
+  imageWrapper: {
+    position: 'relative',
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  removeButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
   },
   editButton: {
     backgroundColor: '#F0F0F0',
