@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useAuthStore } from '../../context/AuthStore'; // Adjust the path as necessary
+import { useAuthStore } from '../../context/AuthStore';
 import { useRouter } from 'expo-router';
 import AuthLayoutComponent from './AuthLayout';
-import { LOGIN_SCREEN, MAIN_SCREEN, REGISTER_SCREEN } from '@/constants/Routes';
+import { LOGIN_SCREEN, MAIN_SCREEN, REGISTER_SCREEN, EMAIL_CONFIRMATION_SCREEN } from '@/constants/Routes';
 
 const RegisterScreen: React.FC = () => {
   const register = useAuthStore((state) => state.register);
@@ -12,12 +12,11 @@ const RegisterScreen: React.FC = () => {
 
   const handleRegister = async () => {
     try {
-      const isRegisterSucces = await register(email, password);
-      isRegisterSucces ? router.replace(MAIN_SCREEN) : router.replace(REGISTER_SCREEN)
-
+      const isRegisterSuccess = await register(email, password);
+      isRegisterSuccess ? router.replace(EMAIL_CONFIRMATION_SCREEN) : router.replace(REGISTER_SCREEN);
     } catch (error) {
       console.error('Registration failed', error);
-      router.replace(REGISTER_SCREEN)
+      router.replace(REGISTER_SCREEN);
     }
   };
 
@@ -27,18 +26,18 @@ const RegisterScreen: React.FC = () => {
 
   return (
     <AuthLayoutComponent
-      title="Register"
+      title="Create Account"
       email={email}
       setEmail={setEmail}
-      emailPlaceHolder = 'joe@example.com'
+      emailPlaceHolder="Email"
       password={password}
       setPassword={setPassword}
       handleSubmit={handleRegister}
-      submitText='Register'
-      footerText="Already Have An Account?"
-      footerActionText="Login"
+      submitText="Sign Up"
+      footerText="Already have an account?"
+      footerActionText="Log In"
       onFooterActionPress={handleLogin}
-      showText={false}
+      showForgotPassword={false}
     />
   );
 };

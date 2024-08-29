@@ -8,6 +8,7 @@ interface AuthState {
   appIsReady: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   register: (email: string, password: string) => Promise<boolean>;
+  confirmEmail: (code: string) => Promise<boolean>;
   forgotPassword: (email: string) => Promise<boolean>;
   confirmResetPassword: (code: string) => Promise<boolean>;
   resetPassword: (password1: string, password2: string) => Promise<boolean>;
@@ -75,18 +76,30 @@ export const useAuthStore = create<AuthState>((set, get) => {
     register: async (email: string, password: string) => {
       try {
         const response = await api.post('/auth/register/', { email, password });
-        const newToken = response.data.token;
 
-        if (newToken.startsWith('Invalid')) {
+        if (response.data.success == 'true' || response.data.success == true) {
           set({ token: null });
-          console.error('Registration failed', newToken);
-          return false;
-        } else {
-          await setTokenAndPersist(newToken);
+          console.log('Registration success');
           return true;
+        } else {
+          return false;
         }
       } catch (error) {
         console.error('Registration failed', error);
+        return false;
+      }
+    },
+
+    confirmEmail: async (code: string) => {
+      try {
+        const response = await api.post('/auth/confirm/email', { code });
+        if (response.data.success) {
+          await get().setTokenAndPersist(response.data.data);
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.error('Email confirmation failed', error);
         return false;
       }
     },

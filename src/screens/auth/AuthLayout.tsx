@@ -1,13 +1,11 @@
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedView } from '@/components/ThemedView';
-import { FORGOT_PASS_SCREEN } from '@/constants/Routes';
-import { router } from 'expo-router';
 import React from 'react';
-import { Alert, Button, Image, KeyboardAvoidingView, Platform, Pressable, SafeAreaView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from '@/components/ThemedText';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
-const logo = require("../../../assets/images/icon.png");
-
-interface AuthLayout {
+interface AuthLayoutProps {
   title: string;
   email: string;
   setEmail: (email: string) => void;
@@ -19,14 +17,15 @@ interface AuthLayout {
   footerText: string;
   footerActionText: string;
   onFooterActionPress: () => void;
-  showText: boolean;
+  showForgotPassword: boolean;
+  onForgotPasswordPress?: () => void;
 }
 
-const AuthLayoutComponent: React.FC<AuthLayout> = ({
+const AuthLayoutComponent: React.FC<AuthLayoutProps> = ({
   title,
   email,
   setEmail,
-  emailPlaceHolder = "Email",
+  emailPlaceHolder,
   password,
   setPassword,
   handleSubmit,
@@ -34,161 +33,129 @@ const AuthLayoutComponent: React.FC<AuthLayout> = ({
   footerText,
   footerActionText,
   onFooterActionPress,
-  showText
+  showForgotPassword,
+  onForgotPasswordPress,
 }) => {
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'commonWhite');
+  const placeholderColor = useThemeColor({}, 'activeColor');
+  const primaryColor = useThemeColor({}, 'primaryText');
+
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.select({ ios: 50, android: 70 })}
-    >
-      <ParallaxScrollView contentContainerStyle={styles.scrollContent}>
-          <ThemedView style={styles.container}>
-            <Image source={logo} style={styles.image} resizeMode='cover' />
-
-            <Text style={styles.title}>{title}</Text>
-
-            <ThemedView style={styles.inputView}>
+    <SafeAreaView style={[styles.container, { backgroundColor }]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoidingView}
+      >
+        <ThemedView style={styles.content}>
+          <ThemedText style={styles.title}>{title}</ThemedText>
+          <View style={styles.inputContainer}>
+            <Ionicons name="mail-outline" size={24} color={placeholderColor} style={styles.inputIcon} />
+            <TextInput
+              style={[styles.input, { color: textColor }]}
+              placeholder={emailPlaceHolder}
+              placeholderTextColor={placeholderColor}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+          </View>
+          {password !== null && (
+            <View style={styles.inputContainer}>
+              <Ionicons name="lock-closed-outline" size={24} color={placeholderColor} style={styles.inputIcon} />
               <TextInput
-                style={styles.input}
-                placeholder={emailPlaceHolder}
-                value={email}
-                onChangeText={setEmail}
-                autoCorrect={false}
-                autoCapitalize='none'
-              />
-              {password !== null ?             
-              <TextInput
-                style={styles.input}
-                placeholder='Password'
+                style={[styles.input, { color: textColor }]}
+                placeholder="Password"
+                placeholderTextColor={placeholderColor}
                 secureTextEntry
-                value={password!}
+                value={password}
                 onChangeText={setPassword}
-                autoCorrect={false}
-                autoCapitalize='none'
-              /> : null}
-
-            </ThemedView>
-
-            <ThemedView style={styles.rememberView}>
-                <Pressable onPress={() => router.push(FORGOT_PASS_SCREEN)}>
-                    {showText ? (
-                    <Text style={styles.forgetText}>
-                      Forgot Password ?
-                    </Text> ) : ( null )
-                    }
-                </Pressable>
-            </ThemedView>
-
-            <ThemedView style={styles.buttonView}>
-              <Pressable style={styles.button} onPress={handleSubmit}>
-                <Text style={styles.buttonText}>{submitText}</Text>
-              </Pressable>
-            </ThemedView>
-
-            <Text style={styles.footerText}>
-              {footerText}
-              <Pressable onPress={onFooterActionPress}>
-                <Text style={styles.signup}> {footerActionText}</Text>
-              </Pressable>
-            </Text>
-          </ThemedView>
-      </ParallaxScrollView>
-    </KeyboardAvoidingView>
-
+              />
+            </View>
+          )}
+          {showForgotPassword && (
+            <TouchableOpacity onPress={onForgotPasswordPress} style={styles.forgotPasswordButton}>
+              <ThemedText style={styles.forgotPasswordText}>Forgot Password?</ThemedText>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity style={[styles.submitButton, { backgroundColor: primaryColor }]} onPress={handleSubmit}>
+            <ThemedText style={styles.submitButtonText}>{submitText}</ThemedText>
+          </TouchableOpacity>
+        </ThemedView>
+      </KeyboardAvoidingView>
+      <View style={styles.footer}>
+        <ThemedText>{footerText}</ThemedText>
+        <TouchableOpacity onPress={onFooterActionPress}>
+          <ThemedText style={[styles.footerActionText, { color: primaryColor }]}>{footerActionText}</ThemedText>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-    container : {
-      alignItems : "center",
-      paddingTop: 60,
-    },
-    image : {
-      height : 160,
-      width : 170
-    },
-    title : {
-      fontSize : 30,
-      fontWeight : "bold",
-      textAlign: "center",
-      paddingVertical : 40,
-  
-    },
-    inputView : {
-      gap : 15,
-      width : "140%",
-      marginBottom  :5,
-    },
-    input : {
-      height : 50,
-      paddingHorizontal : 10,
-      borderColor : "gray",
-      borderWidth : 1,
-      borderRadius: 7,
-      backgroundColor: 'gray'
-    },
-    rememberView : {
-      width : "100%",
-      //paddingHorizontal : 50,
-      flexDirection : "row",
-      marginBottom : 8,
-      marginTop: 8
-    },
-    switch :{
-      flexDirection : "row",
-      gap : 1,
-      justifyContent : "center",
-      alignItems : "center"
-    },
-    forgetText : {
-      fontSize : 14,
-      color : "red"
-    },
-    button : {
-      backgroundColor : "purple",
-      height : 45,
-      borderColor : "gray",
-      borderWidth  : 1,
-      borderRadius : 5,
-      alignItems : "center",
-      justifyContent : "center",
-      marginTop: 6
-    },
-    buttonText : {
-      color : "white",
-      fontSize: 18,
-      fontWeight : "bold"
-    }, 
-    buttonView :{
-      width :"100%",
-    },
-    icons : {
-      width : 40,
-      height: 40,
-    },
-    footerText : {
-      color : "gray",
-      marginTop: 6
-    },
-    signup : {
-      color : "red",
-    },
-    headerImage: {
-      color: '#808080',
-      bottom: -90,
-      left: -35,
-      position: 'absolute',
-    },
-    titleContainer: {
-      flexDirection: 'row',
-      gap: 8,
-    },
-    scrollContent: {
-      flexGrow: 1,
-      alignItems: 'center',
-    },
-  })
-  
+  container: {
+    flex: 1,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginBottom: 40,
+    textAlign: 'center',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    marginBottom: 20,
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
+    height: 40,
+    fontSize: 16,
+  },
+  forgotPasswordButton: {
+    alignSelf: 'flex-end',
+    marginBottom: 20,
+  },
+  forgotPasswordText: {
+    fontSize: 14,
+  },
+  submitButton: {
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  submitButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 20,
+  },
+  footerActionText: {
+    marginLeft: 5,
+    fontWeight: 'bold',
+  },
+});
 
 export default AuthLayoutComponent;

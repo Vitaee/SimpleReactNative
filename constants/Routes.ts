@@ -8,6 +8,7 @@ export const TIMELINE_DETAIL_SCREEN = '/timelines/timelinedetail'
 export const LOGIN_SCREEN = '/auth/login';
 export const REGISTER_SCREEN = '/auth/register';
 export const CONFIRM_RESET_SCREEN = '/auth/confirmreset';
+export const EMAIL_CONFIRMATION_SCREEN = '/auth/emailconfirmation';
 export const RESET_PASS_SCREEN = '/auth/resetpass';
 export const FORGOT_PASS_SCREEN = '/auth/forgotpass';
 
