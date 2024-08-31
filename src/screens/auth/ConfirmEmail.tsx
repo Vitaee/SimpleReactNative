@@ -7,11 +7,18 @@ import { useAuthStore } from '@/src/context/AuthStore';
 import { EMAIL_CONFIRMATION_SCREEN, MAIN_SCREEN } from '@/constants/Routes';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
-const EmailConfirmationScreen: React.FC = () => {
+interface EmailConfirmationScreenProps {
+  email: string;
+}
+
+const EmailConfirmationScreen: React.FC<EmailConfirmationScreenProps> = ({ email }) => {
   const [code, setCode] = useState('');
   const [timeLeft, setTimeLeft] = useState(180); // 3 minutes in seconds
   const router = useRouter();
   const confirmEmail = useAuthStore((state) => state.confirmEmail);
+  const [canResend, setCanResend] = useState(false);
+  const resendCode = useAuthStore((state) => state.resendCode);
+
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'commonWhite');
 
@@ -22,6 +29,14 @@ const EmailConfirmationScreen: React.FC = () => {
     }, 1000);
 
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const resendTimer = setTimeout(() => {
+      setCanResend(true);
+    }, 60000); // Enable resend after 1 minute
+
+    return () => clearTimeout(resendTimer);
   }, []);
 
   const handleConfirm = async () => {
@@ -35,6 +50,18 @@ const EmailConfirmationScreen: React.FC = () => {
       }
     } catch (error) {
       console.error('Email confirmation failed', error);
+    }
+  };
+
+  const handleResendCode = async (email:string) => {
+    try {
+      await resendCode(email);
+      setCanResend(false);
+      setTimeLeft(60); // Reset timer
+      // Set a new timer to enable resend button
+      setTimeout(() => setCanResend(true), 60000);
+    } catch (error) {
+      console.error('Failed to resend code', error);
     }
   };
 
@@ -66,6 +93,15 @@ const EmailConfirmationScreen: React.FC = () => {
         <TouchableOpacity style={styles.button} onPress={handleConfirm}>
           <ThemedText style={styles.buttonText}>Confirm</ThemedText>
         </TouchableOpacity>
+        <TouchableOpacity 
+        style={[styles.resendButton, !canResend && styles.resendButtonDisabled]}
+        onPress={() => handleResendCode(email)}
+        disabled={!canResend}
+        >
+        <ThemedText style={styles.resendButtonText}>
+          Resend Code
+        </ThemedText>
+      </TouchableOpacity>
         <ThemedText style={styles.timer}>
           Time remaining: {formatTime(timeLeft)}
         </ThemedText>
@@ -124,6 +160,19 @@ const styles = StyleSheet.create({
   },
   keyboardAvoidingView: {
     flex: 1,
+  },
+  resendButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#007AFF',
+    borderRadius: 5,
+  },
+  resendButtonDisabled: {
+    backgroundColor: '#ccc',
+  },
+  resendButtonText: {
+    color: 'white',
+    fontSize: 16,
   },
 });
 

@@ -13,7 +13,8 @@ const RegisterScreen: React.FC = () => {
   const handleRegister = async () => {
     try {
       const isRegisterSuccess = await register(email, password);
-      isRegisterSuccess ? router.replace(EMAIL_CONFIRMATION_SCREEN) : router.replace(REGISTER_SCREEN);
+      isRegisterSuccess ? router.push({ pathname: EMAIL_CONFIRMATION_SCREEN, params: { email } }) : 
+      router.replace(REGISTER_SCREEN);
     } catch (error) {
       console.error('Registration failed', error);
       router.replace(REGISTER_SCREEN);

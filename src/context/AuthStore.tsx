@@ -11,6 +11,7 @@ interface AuthState {
   confirmEmail: (code: string) => Promise<boolean>;
   forgotPassword: (email: string) => Promise<boolean>;
   confirmResetPassword: (code: string) => Promise<boolean>;
+  resendCode: (email: string) => Promise<boolean>;
   resetPassword: (password1: string, password2: string) => Promise<boolean>;
   logout: () => Promise<boolean>;
   checkAuthStatus: () => Promise<boolean>;
@@ -100,6 +101,16 @@ export const useAuthStore = create<AuthState>((set, get) => {
         return false;
       } catch (error) {
         console.error('Email confirmation failed', error);
+        return false;
+      }
+    },
+
+    resendCode: async (email: string) => {
+      try {
+        const response = await api.post('/auth/confirm/resend/', { email });
+        return response.data.success;
+      } catch (error) {
+        console.error('Resend code failed', error);
         return false;
       }
     },

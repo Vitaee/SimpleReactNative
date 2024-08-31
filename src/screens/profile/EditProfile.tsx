@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useThemeColor } from '@/hooks/useThemeColor';
@@ -30,7 +30,13 @@ const EditProfileScreen: React.FC = () => {
   }, [fetchUserData]);
 
   return (
+    <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoidingView}
+      >
     <ParallaxScrollView style={styles.container}>
+      
+      
       <ThemedView style={styles.headerContainer}>
 
           <ThemedView style={styles.profileImageContainer}>
@@ -60,8 +66,8 @@ const EditProfileScreen: React.FC = () => {
         <TextInput
           style={styles.input}
           placeholder={user!.data.user.email}
-          value={name}
-          onChangeText={setName}
+          value={user!.data.user.email}
+          editable={false}
         />
       </ThemedView>
 
@@ -78,20 +84,24 @@ const EditProfileScreen: React.FC = () => {
         />
       </ThemedView>
 
-      <ThemedView style={styles.inputContainer}>
-        <ThemedText style={styles.label}>Konum</ThemedText>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your location"
-          value={location}
-          onChangeText={setLocation}
-        />
-      </ThemedView>
+      
+        <ThemedView style={styles.inputContainer}>
+          <ThemedText style={styles.label}>Konum</ThemedText>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your location"
+            value={location}
+            onChangeText={setLocation}
+          />
+        </ThemedView>
+      
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
         <ThemedText style={styles.saveButtonText}>Güncelle</ThemedText>
       </TouchableOpacity>
+     
     </ParallaxScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -145,6 +155,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  keyboardAvoidingView: {
+    flex: 1,
   },
 });
 
