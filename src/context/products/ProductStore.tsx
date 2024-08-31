@@ -19,9 +19,12 @@ interface ProductState {
     fetchProducts: (pageNumber: number, brandId?: string, selectedCategory?: string) => Promise<void>;
     fetchSearchProducts: (searchQuery: string, pageNumber: number, brandId?: string) => Promise<void>;
     fetchCategories: (brandId?: string) => Promise<void>;
+    commentOnProduct: (productId: string, comment: string) => Promise<void>;
+    fetchCommentsOfProudct: (productId: string) => Promise<void>;
     likeOrUnlikeProduct: (productId: string, timelineEvent?: string) => Promise<void>;
     isProductLiked: (productId: string) => boolean;
     likedProducts: { [key: string]: boolean };
+    comments: []
     addOrRemoveProductToFavs: (productId: string, type: string) => Promise<void>;
     favedProducts: { [key: string]: boolean };
   }
@@ -40,6 +43,7 @@ interface ProductState {
     categoriesError: null,
     likedProducts: {},
     favedProducts: {},
+    comments: [],
     
 
     fetchProducts: async (pageNumber, brandId, selectedCategory) => {
@@ -111,50 +115,70 @@ interface ProductState {
       }
     },
 
-  likeOrUnlikeProduct: async (productId, timelineEvent) => {
-    try {
-      const response = timelineEvent
-        ? await api.delete('product/event/', { data: { timeline_event: timelineEvent, product_id: productId } })
-        : await api.put('product/event/', { product_id: productId });
-
-      if (response.status === 200) {
-        set((state) => ({
-          ...state,
-          likedProducts: {
-            ...state.likedProducts,
-            [productId]: !state.likedProducts[productId],
-          },
-        }));
+    commentOnProduct: async (productId: string, comment: string) => { 
+      try {
+        const response = await api.put('product/event/',  { product_id: productId, text: comment } );
+        console.log('Comment response:', response.data);
+      } catch (err) {
+        console.error('Error commenting on product:', err);
       }
+    },
 
-    } catch (err) {
-      console.error('Error liking or unliking product:', err);
-    }
-  },
-
-  isProductLiked: (productId) => {
-    return !!get().likedProducts[productId];
-  },
-
-  addOrRemoveProductToFavs: async (productId, type) => {
-    try {
-      const res = type == "add" ?  await api.post('favourites/', { product_id: productId }) : 
-                          await api.delete('favourites/', { data: { product_id: productId } })
-
-
-      if (res.status=200){
-        set((state) => ({
-          ...state,
-          favedProducts: {
-            ...state.favedProducts,
-            [productId]: !state.favedProducts[productId],
-          },
-        }));
+    fetchCommentsOfProudct: async (productId: string) => {
+      try {
+        console.log(productId);
+        const response = await api.get(`product/event/comment/${productId}/`);
+        set({ comments: response.data.data[0].events });
+      } catch (err) {
+        console.error('Error fetching comments:', err);
       }
-    } catch (err) {
-      console.error('Error liking or unliking product:', err);
-      set({ loading: false, error: err!.toString() });
+    },
+
+
+    likeOrUnlikeProduct: async (productId, timelineEvent) => {
+      try {
+        const response = timelineEvent
+          ? await api.delete('product/event/', { data: { timeline_event: timelineEvent, product_id: productId } })
+          : await api.put('product/event/', { product_id: productId });
+
+        if (response.status === 200) {
+          set((state) => ({
+            ...state,
+            likedProducts: {
+              ...state.likedProducts,
+              [productId]: !state.likedProducts[productId],
+            },
+          }));
+        }
+
+      } catch (err) {
+        console.error('Error liking or unliking product:', err);
+      }
+    },
+
+    isProductLiked: (productId) => {
+      return !!get().likedProducts[productId];
+    },
+
+    addOrRemoveProductToFavs: async (productId, type) => {
+      try {
+        const res = type == "add" ?  await api.post('favourites/', { product_id: productId }) : 
+                            await api.delete('favourites/', { data: { product_id: productId } })
+
+
+        if (res.status=200){
+          set((state) => ({
+            ...state,
+            favedProducts: {
+              ...state.favedProducts,
+              [productId]: !state.favedProducts[productId],
+            },
+          }));
+        }
+      } catch (err) {
+        console.error('Error liking or unliking product:', err);
+        set({ loading: false, error: err!.toString() });
+      }
     }
-  }
 
 }));

@@ -10,11 +10,17 @@ import ImageGallery from '@/components/ImageGallery';
 import { WEBVIEW_SCREEN } from '@/constants/Routes';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import Comments from '@/components/Comments';
+import { useProductStore } from '@/src/context/products/ProductStore';
 
 
 const ProductDetail = () => {
   const { product } = useLocalSearchParams();
   let parsedProduct: Product | null = null;
+
+  
+  const commentService = useProductStore((state) => state.commentOnProduct);
+  const fetchCommentsOfProudct = useProductStore((state) => state.fetchCommentsOfProudct);
+  const comments = useProductStore((state) => state.comments);
 
   try {
     // Safely decode and parse the product data
@@ -32,10 +38,11 @@ const ProductDetail = () => {
 
   const [commentsCount, setCommentsCount] = useState(10);
 
-  const handlePostComment = (comment: string) => {
+  const handlePostComment = async (comment: string, product_id: string) => {
     // Here you can make an API call to post the comment
     console.log('Posting comment:', comment);
     // Update the comments count or fetch the updated comments
+    await commentService(product_id, comment);
     setCommentsCount(prevCount => prevCount + 1);
   };
 
@@ -66,7 +73,8 @@ const ProductDetail = () => {
         title: `${parsedProduct?.product_brand} Ürün Detayı`,
       });
     }
-  }, []);
+    fetchCommentsOfProudct(parsedProduct!._id);
+  }, [fetchCommentsOfProudct]);
 
 
   return (
@@ -93,8 +101,20 @@ const ProductDetail = () => {
             <TouchableOpacity onPress={ () => {openWebView(parsedProduct?.product_link)}}><ThemedText type='subtitle'>Orjinal Link</ThemedText></TouchableOpacity>
           </View>
 
-          <Comments commentCount={commentsCount} onCommentSubmit={handlePostComment} />
+          <Comments commentCount={commentsCount} onCommentSubmit={ (comment: string) => handlePostComment(comment, parsedProduct!._id)} />
 
+          <ThemedView>
+            <ThemedText style={styles.commentsTitle}>Yorumlar</ThemedText>
+            <ThemedText style={styles.commentCount}>Toplam {commentsCount} yorum</ThemedText>
+
+              {comments.map((comment, index) => (
+                <ThemedView key={index}>
+                  <ThemedText>{comment?.event.text}</ThemedText>
+                </ThemedView>
+              ))}
+
+
+          </ThemedView>
         </View>
       </ParallaxScrollView>
     </KeyboardAvoidingView>
