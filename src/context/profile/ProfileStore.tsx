@@ -18,20 +18,20 @@ export const useProfileStore = create<UserState>((set) => ({
   
    fetchUserData: async () => {
         try {
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
-            const response = await api.get<UserApiResponse>('/auth/', {});
-            if (response.status === 200) {
-                set({user:response.data, loading:false})
+            const token = await AsyncStorage.getItem('token');
+            if (token) {
+                const response = await api.get<UserApiResponse>('/auth/', {});
+                if (response.status === 200) {
+                    set({user:response.data, loading:false})
+                } else {
+                    set({ loading: false, error: 'Failed to fetch user' });
+                }
             } else {
                 set({ loading: false, error: 'Failed to fetch user' });
             }
-        } else{
-            set({ loading: false, error: 'Failed to fetch user' });
-        }
         } catch (error) {
-        console.error('Error fetching user data:', error);
-        set({ loading: false, error: 'Failed to fetch user' });
+            console.error('Error fetching user data:', error);
+            set({ loading: false, error: 'Failed to fetch user' });
 
         } finally {
             set({loading: false});

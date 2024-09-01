@@ -81,24 +81,23 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
         set({ timelineCreated: false, loading: false, error: 'Failed to create timeline' });
       }
     },
+
     likeOrUnlikeTimeline: async (timelineId: string, type: string, timeline_event?: string) => {
         const timeline = get().timeline;
         const index = timeline.findIndex((item) => item._id === timelineId);
         if (index === -1) return;
         console.log("index", index);
         console.log("timeline", timelineId);
+      
+        console.log("timeline_event", timeline_event);
     
         try {
           const response = type == "like" ? await api.put(`/timeline/event/`, {   timeline_id: timelineId, text: ""} ) : 
           await api.delete(`/timeline/event/`, { data: { timeline_id: timelineId, timeline_event: timeline_event} });
           
           if (response.status === 200) {
-            const updatedItem = {
-              ...timeline[index],
-              like_count: type === 'like' ? timeline[index].like_count + 1 : timeline[index].like_count - 1,
-            };
             const updatedTimeline = [...timeline]; // /get().upToDateTimeline(timelineId);
-            updatedTimeline[index] = updatedItem;
+            updatedTimeline[index] = response.data.data;
             set({ timeline: updatedTimeline });
           } else {
             console.error('Failed to like/unlike timeline item');

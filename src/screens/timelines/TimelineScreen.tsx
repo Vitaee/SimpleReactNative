@@ -54,7 +54,10 @@ const TimelineScreen = () => {
     let type = "like";
     let timeline_event = "";
 
-    item.events.map((m => { if (m.event.user._id == user?.data.user._id) { type = "unlike"; timeline_event = m.event._id} }));
+    if (item.events.length > 0) {
+      item.events.map((m => { if (m.event.user._id == user?.data.user._id) { type = "unlike"; timeline_event = m._id} }));
+    }
+    
     await likeOrUnlikeTimeline(item._id, type, timeline_event);
   };
 
