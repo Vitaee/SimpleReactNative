@@ -84,9 +84,7 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product, favProducts = [
 
   const isProductFaved = favProducts.includes(product._id) || favedProducts[product._id];
 
-  const handleFavPress = () => {
-    console.log(isProductFaved);
-    
+  const handleFavPress = () => {    
     if (isProductFaved) {
       favProducts = favProducts.filter((favProduct) => favProduct !== product._id);
       addOrRemoveProductToFavs(product._id, "remove");

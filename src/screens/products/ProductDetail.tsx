@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import {  ThemedText } from '../../../components/ThemedText'; 
@@ -11,6 +11,7 @@ import { WEBVIEW_SCREEN } from '@/constants/Routes';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import Comments from '@/components/Comments';
 import { useProductStore } from '@/src/context/products/ProductStore';
+import CommentCard from '@/components/CommentCard';
 
 
 const ProductDetail = () => {
@@ -18,15 +19,13 @@ const ProductDetail = () => {
   let parsedProduct: Product | null = null;
 
   
-  const commentService = useProductStore((state) => state.commentOnProduct);
+  const commentOnProduct = useProductStore((state) => state.commentOnProduct);
   const fetchCommentsOfProudct = useProductStore((state) => state.fetchCommentsOfProudct);
   const comments = useProductStore((state) => state.comments);
 
   try {
     // Safely decode and parse the product data
-    parsedProduct = JSON.parse(decodeURIComponent(encodeURIComponent(product))) ;
-    parsedProduct as Product;
-   
+    parsedProduct = JSON.parse(decodeURIComponent(encodeURIComponent(product as string))) as Product;   
   } catch (error) {
     console.error('Failed to parse product data:', error);
     return (
@@ -39,10 +38,7 @@ const ProductDetail = () => {
   const [commentsCount, setCommentsCount] = useState(10);
 
   const handlePostComment = async (comment: string, product_id: string) => {
-    // Here you can make an API call to post the comment
-    console.log('Posting comment:', comment);
-    // Update the comments count or fetch the updated comments
-    await commentService(product_id, comment);
+    await commentOnProduct(product_id, comment);
     setCommentsCount(prevCount => prevCount + 1);
   };
 
@@ -60,7 +56,7 @@ const ProductDetail = () => {
       return null;
     }
 
-    if(discount != "0"  ){
+    if(discount != "0" && discount!.length > 0) {
       return discount + " TL";
     }
 
@@ -81,10 +77,9 @@ const ProductDetail = () => {
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.select({ ios: 100, android: 70 })}
-    >
+      keyboardVerticalOffset={Platform.select({ ios: 100, android: 70 })}>
+
       <ParallaxScrollView>
-        
         <ImageGallery images={parsedProduct?.product_image} />
         <View style={[styles.detailsContainer, { backgroundColor: cardBackgroundColor }]}>
           <View style={styles.ratingContainer}>
@@ -101,18 +96,17 @@ const ProductDetail = () => {
             <TouchableOpacity onPress={ () => {openWebView(parsedProduct?.product_link)}}><ThemedText type='subtitle'>Orjinal Link</ThemedText></TouchableOpacity>
           </View>
 
-          <Comments commentCount={commentsCount} onCommentSubmit={ (comment: string) => handlePostComment(comment, parsedProduct!._id)} />
+          <Comments onCommentSubmit={ (comment: string) => handlePostComment(comment, parsedProduct!._id)} />
 
           <ThemedView>
             <ThemedText style={styles.commentsTitle}>Yorumlar</ThemedText>
-            <ThemedText style={styles.commentCount}>Toplam {commentsCount} yorum</ThemedText>
+            <ThemedText style={styles.commentCount}>Toplam {comments.length} yorum</ThemedText>
 
-              {comments.map((comment, index) => (
-                <ThemedView key={index}>
-                  <ThemedText>{comment?.event.text}</ThemedText>
-                </ThemedView>
-              ))}
-
+            <ThemedView>
+                {comments.map((comment, index) => (
+                  <CommentCard key={index} comment={comment} />
+                ))}
+            </ThemedView>
 
           </ThemedView>
         </View>
@@ -192,25 +186,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   commentsTitle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
+    marginBottom: 10,
   },
   commentCount: {
-    fontSize: 14,
-    color: '#999',
-  },
-  commentInput: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 8,
-    borderWidth: 1,
-    borderRadius: 8,
-    marginTop: 16,
-  },
-  commentPlaceholder: {
-    marginLeft: 8,
-    fontSize: 14,
-  },
+    color: '#888',
+    marginBottom: 20,
+  } 
 });
 
 export default ProductDetail;

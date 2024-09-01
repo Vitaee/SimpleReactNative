@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import api from '../../services/api'; // Ensure to import your api instance
 import { Pagination, Product } from '@/constants/ProductType';
 import { ProductCategory } from '@/constants/ProductCategoriesType';
+import CommentType from '@/constants/CommentType';
 
 
 interface ProductState {
@@ -24,7 +25,7 @@ interface ProductState {
     likeOrUnlikeProduct: (productId: string, timelineEvent?: string) => Promise<void>;
     isProductLiked: (productId: string) => boolean;
     likedProducts: { [key: string]: boolean };
-    comments: []
+    comments: CommentType[];
     addOrRemoveProductToFavs: (productId: string, type: string) => Promise<void>;
     favedProducts: { [key: string]: boolean };
   }
@@ -118,7 +119,10 @@ interface ProductState {
     commentOnProduct: async (productId: string, comment: string) => { 
       try {
         const response = await api.put('product/event/',  { product_id: productId, text: comment } );
-        console.log('Comment response:', response.data);
+
+        if ( response.status === 200 ) { 
+          await get().fetchCommentsOfProudct(productId);
+        }
       } catch (err) {
         console.error('Error commenting on product:', err);
       }
@@ -126,7 +130,6 @@ interface ProductState {
 
     fetchCommentsOfProudct: async (productId: string) => {
       try {
-        console.log(productId);
         const response = await api.get(`product/event/comment/${productId}/`);
         set({ comments: response.data.data[0].events });
       } catch (err) {

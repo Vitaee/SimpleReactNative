@@ -5,7 +5,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from './ThemedView';
 
 
-const CommentSection = ({ commentCount, onCommentSubmit }) => {
+const CommentSection = ({ onCommentSubmit }) => {
   const [comment, setComment] = useState('');
   const [isInputFocused, setInputFocused] = useState(false);
 

@@ -5,14 +5,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { router } from 'expo-router';
-import  api  from '../../services/api';
 import { useThemeColor } from '../../../hooks/useThemeColor';
-import { UserApiResponse } from '@/constants/UserType';
 import { SPLASH_SCREEN } from '@/constants/Routes';
 import { useProfileStore } from '@/src/context/profile/ProfileStore';
 import ImagePickerComponent from '@/components/ImagePicker';
 import { useFavsStore } from '@/src/context/profile/FavouritesStore';
-
 
 
 const ProfileScreen = () => {

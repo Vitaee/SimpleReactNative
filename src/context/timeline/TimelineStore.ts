@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import api from '../../services/api'; // Ensure to import your api instance
 import { TimelineApiResponse, TimelineData, TimelineFormData } from '@/constants/TimelineType';
+import { AxiosError } from 'axios';
 
 
 interface TimelineState {
@@ -85,24 +86,26 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
         const index = timeline.findIndex((item) => item._id === timelineId);
         if (index === -1) return;
         console.log("index", index);
-        console.log("timeline", timeline);
+        console.log("timeline", timelineId);
     
         try {
-          const response = type == "like" ? await api.put(`/timeline/event/`, { data: { timeline_id: timelineId, text: ""} }) : 
-          await api.delete(`/timeline/event/`, { data: { timeline_id: timelineId, timeline_event: ""} });
-
+          const response = type == "like" ? await api.put(`/timeline/event/`, {   timeline_id: timelineId, text: ""} ) : 
+          await api.delete(`/timeline/event/`, { data: { timeline_id: timelineId, timeline_event: timeline_event} });
+          
           if (response.status === 200) {
             const updatedItem = {
               ...timeline[index],
               like_count: type === 'like' ? timeline[index].like_count + 1 : timeline[index].like_count - 1,
             };
-            const updatedTimeline = [...timeline];
+            const updatedTimeline = [...timeline]; // /get().upToDateTimeline(timelineId);
             updatedTimeline[index] = updatedItem;
             set({ timeline: updatedTimeline });
           } else {
             console.error('Failed to like/unlike timeline item');
           }
-        } catch (error) {
+        } catch (error: AxiosError | any) {
+          console.log("response", error);
+          console.log("response", error.response.data);
           console.error('Error liking/unliking timeline item:', error);
         }
       },

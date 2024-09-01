@@ -10,8 +10,13 @@ import { useRouter } from 'expo-router';
 import { TIMELINE_DETAIL_SCREEN } from '@/constants/Routes';
 import { useTimelineStore } from '@/src/context/timeline/TimelineStore';
 import { formatDate } from '@/src/services/utils';
+import { useProfileStore } from '@/src/context/profile/ProfileStore';
 
 const TimelineScreen = () => {
+  const user = useProfileStore((state) => state.user);
+  const fetchUserData = useProfileStore((state) => state.fetchUserData);
+
+
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
@@ -46,9 +51,11 @@ const TimelineScreen = () => {
   };
 
   const handleLikePress = async (item: TimelineData) => {
-    let type = "";
-    item.events.map((m => {m.event.user._id == '' })) ? 'unlike' : 'like';
-    await likeOrUnlikeTimeline(item._id, type, "0");
+    let type = "like";
+    let timeline_event = "";
+
+    item.events.map((m => { if (m.event.user._id == user?.data.user._id) { type = "unlike"; timeline_event = m.event._id} }));
+    await likeOrUnlikeTimeline(item._id, type, timeline_event);
   };
 
   const loadMore = () => {
@@ -65,7 +72,8 @@ const TimelineScreen = () => {
 
   useEffect(() => {
     fetchTimelines(); 
-  }, []);
+    fetchUserData();
+  }, [fetchUserData]);
 
   const renderFooter = () => {
     if (!loading) return null;
@@ -95,7 +103,7 @@ const TimelineScreen = () => {
                   ) : null}
                   <ThemedView style={styles.actions}>
                     <TouchableOpacity style={styles.actionButton} onPress={() => handleLikePress(item)}>
-                      <Ionicons name={item.events ? "heart" : "heart-outline"} size={20} color="#666" />
+                      <Ionicons name={item.events ? "heart" : "heart-outline"} size={20} color="red" />
                       <ThemedText style={styles.actionText}>{item.like_count}</ThemedText>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.actionButton} onPress={() => handleLikePress(item)}>
