@@ -94,6 +94,20 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product, favProducts = [
     }
   };
 
+  const displayDiscount = (discount: string | undefined) => {
+    
+
+    if(discount != "0" && discount!.length > 0) {
+      return discount + " TL";
+    }
+
+    if (isNaN(Number(discount))){
+      return null;
+    }
+
+    return null;
+  }
+
  
 
   return (
@@ -115,7 +129,7 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product, favProducts = [
         <Text style={[styles.rating, { color: cardTextColor }]}>4.0</Text>
       </View>
       <ThemedText style={[styles.price, { color: cardTextColor }]}>{product.product_price} tl</ThemedText>
-      <Text style={styles.discountedPrice}>{product.product_discount} tl</Text>
+      <Text style={styles.discountedPrice}>{displayDiscount(product.product_discount)}</Text>
       <Animated.View style={[styles.likeButton, animatedHeartStyle]}>
         <TouchableOpacity style={styles.likeButton} onPress={triggerLikeAnimation}>
           {isProductLiked(product._id)  ? (
@@ -134,9 +148,8 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 8,
     padding: 18,
-    margin: 8,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.5,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 0 },
     elevation: 5,
@@ -145,7 +158,7 @@ const styles = StyleSheet.create({
   image: {
     width: 120,
     height: 120,
-    marginBottom: 8,
+    padding: 14
   },
   title: {
     fontSize: 14,
@@ -176,12 +189,12 @@ const styles = StyleSheet.create({
   likeButton: {
     position: 'absolute',
     top: 7,
-    right: 8,
+    right: 3,
   },
   favoriteButton: {
     position: 'absolute',
     top: 7,
-    left: 8,
+    left: 3,
   },
 });
 

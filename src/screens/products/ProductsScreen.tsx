@@ -186,19 +186,17 @@ const ProductsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 18,
   },
-  
   categoriesContent: {
     paddingHorizontal: 1,
   },
   categoryButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 80,
-    paddingVertical: 10,
+    //alignItems: 'center',
+    //justifyContent: 'center',
     marginHorizontal: 5,
     borderRadius: 8,
+    marginBottom: 10,
   },
   selectedCategory: {
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
@@ -206,13 +204,12 @@ const styles = StyleSheet.create({
     color: 'purple',
   },
   categoryText: {
-    marginTop: 5,
-    fontSize: 12,
+    fontSize: 14,
     textAlign: 'center',
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: '#E0E0E0',
     borderRadius: 8,
-    padding: 8,
+    padding: 10,
     color: '#E0E0E0',
   },
   row: {
