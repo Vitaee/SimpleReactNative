@@ -3,6 +3,7 @@ import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '../hooks/useThemeColor';
 import FilterModal from './FilterModal';
+import { useProductStore } from '@/src/context/products/ProductStore';
 
 interface SearchBarProps {
   searchQuery: string;
@@ -15,8 +16,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, handleSearch  }) => 
 
   const [showFilters, setShowFilters] = useState(false);
 
+  const { applyFilters } = useProductStore();
+
   const handleApplyFilters = (filters: any) => {
     console.log(filters);
+    applyFilters(filters, 1);
   };
 
   return (

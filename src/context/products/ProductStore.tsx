@@ -4,6 +4,13 @@ import { Pagination, Product } from '@/constants/ProductType';
 import { ProductCategory } from '@/constants/ProductCategoriesType';
 import CommentType from '@/constants/CommentType';
 
+interface Filters {
+  sortBy: 'price' | 'date' | 'name';
+  sortOrder: 'A-Z' | '0-100' | '100-0';
+  priceRange: { min: string; max: string };
+  dateRange: { start: Date | null; end: Date | null };
+}
+
 
 interface ProductState {
     products: Product[];
@@ -28,6 +35,8 @@ interface ProductState {
     comments: CommentType[];
     addOrRemoveProductToFavs: (productId: string, type: string) => Promise<void>;
     favedProducts: { [key: string]: boolean };
+    applyFilters: (filters: Filters, pageNumber: number) => Promise<void>;
+
   }
   
   export const useProductStore = create<ProductState>((set, get) => ({
@@ -98,6 +107,23 @@ interface ProductState {
       } catch (err) {
         console.error('Error searching products:', err);
         
+        set({ searchLoading: false, searchError: err!.toString() });
+      }
+    },
+
+    applyFilters: async (filters, pageNumber) => {
+      set({ searchLoading: true, searchError: null });
+      try {
+        //const { sortBy, sortOrder, priceRange, dateRange } = filters;
+        const response = await api.post('/product/filter/', filters);
+  
+        set((state) => ({
+          products: pageNumber === 1 ? response.data.data : [...state.products, ...response.data.data],
+          pagination: response.data.pagination,
+          searchLoading: false,
+        }));
+      } catch (err) {
+        console.error('Error applying filters:', err);
         set({ searchLoading: false, searchError: err!.toString() });
       }
     },
