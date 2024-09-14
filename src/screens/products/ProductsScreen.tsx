@@ -42,6 +42,13 @@ const ProductsScreen: React.FC = () => {
 
   const userFavs = useFavsStore((state) => state.fetchUserFavs);
   const favs = useFavsStore((state) => state.favs);
+  
+  const { applyFilters } = useProductStore();
+
+  const handleApplyFilters = (filters: any) => {
+    console.log(filters);
+    applyFilters(filters, 1);
+  };
 
   useEffect(() => {
     userFavs();
@@ -97,6 +104,7 @@ const ProductsScreen: React.FC = () => {
       <SearchBar
         searchQuery={searchQuery}
         handleSearch={handleSearch}
+        filtersProvider={handleApplyFilters}
       />
 
       <ParallaxScrollView

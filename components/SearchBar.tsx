@@ -8,20 +8,16 @@ import { useProductStore } from '@/src/context/products/ProductStore';
 interface SearchBarProps {
   searchQuery: string;
   handleSearch: (text: string) => void;
+  filtersProvider: (filters: any) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, handleSearch  }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, handleSearch, filtersProvider  }) => {
   const borderColor = useThemeColor({}, 'borderColor');
   const textColor = useThemeColor({}, 'primaryText');
 
   const [showFilters, setShowFilters] = useState(false);
 
-  const { applyFilters } = useProductStore();
-
-  const handleApplyFilters = (filters: any) => {
-    console.log(filters);
-    applyFilters(filters, 1);
-  };
+  
 
   return (
     <View style={styles.header}>
@@ -38,7 +34,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, handleSearch  }) => 
       <TouchableOpacity onPress={() => setShowFilters(true)} style={styles.filterButton}>
           <Ionicons name="options-outline" size={24} color={textColor} />
         </TouchableOpacity>
-        <FilterModal visible={showFilters} onClose={() => setShowFilters(false)} onApply={handleApplyFilters} />
+        <FilterModal visible={showFilters} onClose={() => setShowFilters(false)} onApply={filtersProvider} />
 
     </View>
   );

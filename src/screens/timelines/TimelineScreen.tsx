@@ -83,9 +83,16 @@ const TimelineScreen = () => {
     return <ActivityIndicator size="large" color={textColor} />;
   };
 
+  const { applyFilters } = useTimelineStore();
+
+  const handleApplyFilters = (filters: any) => {
+    console.log(filters);
+    applyFilters(filters, 1);
+  };
+
   return (
     <ThemedView style={styles.container}>
-      <SearchBar searchQuery={searchQuery} handleSearch={handleSearch} />
+      <SearchBar searchQuery={searchQuery} handleSearch={handleSearch} filtersProvider={handleApplyFilters}  />
       {error ? (
         <ThemedText type="title">{error}</ThemedText>
       ) : (

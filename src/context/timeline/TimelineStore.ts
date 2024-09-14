@@ -3,6 +3,12 @@ import api from '../../services/api'; // Ensure to import your api instance
 import { TimelineApiResponse, TimelineData, TimelineFormData } from '@/constants/TimelineType';
 import { AxiosError } from 'axios';
 
+interface TimelineFilters {
+  sortBy: 'price' | 'date' | 'name';
+  sortOrder: 'A-Z' | '0-100' | '100-0';
+  //priceRange: { min: string; max: string };
+  dateRange: { start: Date | null; end: Date | null };
+}
 
 interface TimelineState {
     timeline: TimelineData[];
@@ -14,7 +20,7 @@ interface TimelineState {
     createTimeline: (data: TimelineFormData) => Promise<void>;
     timelineCreated?: boolean;
     likeOrUnlikeTimeline: (timelineId: string, type: string, timeline_event?: string) => Promise<void>;
-
+    applyFilters: (filters: TimelineFilters, pageNumber: number) => Promise<void>;
 }
 
 export const useTimelineStore = create<TimelineState>((set, get) => ({
@@ -45,6 +51,26 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
         } finally {
             set({loading: false});
         }
+    },
+
+    applyFilters: async ( filters: TimelineFilters, pageNumber: number) => {
+      set({ loading: true, error: null });
+      try {
+          const res = await api.post('/timeline/filter/', filters);
+
+          set( (state) => ({
+              timeline: pageNumber === 1 ? res.data.data: [...state.timeline, ...res.data.data],
+              loading: false,
+              error: null
+          }));
+      } catch (err){
+          console.error('Error applying filters for timelines:', err);
+          set( (state) => ({
+            timeline: [],
+            loading: false,
+            error: err!.toString()
+        }));
+      }
     },
 
     createTimeline: async (data: TimelineFormData) => {
