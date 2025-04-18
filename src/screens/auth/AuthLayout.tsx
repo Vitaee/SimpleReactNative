@@ -49,7 +49,7 @@ const AuthLayoutComponent: React.FC<AuthLayoutProps> = ({
       >
         <ThemedView style={styles.content}>
           <ThemedText style={styles.title}>{title}</ThemedText>
-          <View style={styles.inputContainer}>
+          <ThemedView style={styles.inputContainer}>
             <Ionicons name="mail-outline" size={24} color={placeholderColor} style={styles.inputIcon} />
             <TextInput
               style={[styles.input, { color: textColor }]}
@@ -60,7 +60,7 @@ const AuthLayoutComponent: React.FC<AuthLayoutProps> = ({
               autoCapitalize="none"
               keyboardType="email-address"
             />
-          </View>
+          </ThemedView>
           {password !== null && (
             <View style={styles.inputContainer}>
               <Ionicons name="lock-closed-outline" size={24} color={placeholderColor} style={styles.inputIcon} />

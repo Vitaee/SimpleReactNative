@@ -36,18 +36,7 @@ npm run reset-project
 This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
 ## Screenshots
-A sample screenshots of project below.
-
-### Splash, Login, Register
-<img src ="https://github.com/Vitaee/SimpleReactNative/assets/45064650/0959d5b5-7734-434c-a026-3d23d98ca8c9"  width="300" height="680" />
-<img src ="https://github.com/Vitaee/SimpleReactNative/assets/45064650/8cffc506-6a95-4908-b35b-a7adcd69b23c"  width="300" height="680" />
-<img src ="https://github.com/Vitaee/SimpleReactNative/assets/45064650/f70f6cd7-c6b4-491c-b75f-1529cda4b993"  width="300" height="680" />
-
-### Profile, Products, Main
-<img src ="https://github.com/user-attachments/assets/2c5b2066-057e-4f48-a790-ba7425285830"  width="300" height="680" />
-<img src ="https://github.com/user-attachments/assets/758152cb-d5a9-4400-abc5-89f062b7cbd5"  width="300" height="680" />
-<img src ="https://github.com/user-attachments/assets/28ff320e-9ff7-4338-9211-4b15c84ea064"  width="300" height="680" />
-
+A sample screenshots of project located at screenshots folder.
 
 
 ## Learn more
