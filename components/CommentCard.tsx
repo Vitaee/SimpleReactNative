@@ -3,6 +3,8 @@ import { StyleSheet, Image, View } from 'react-native';
 import { ThemedView } from './ThemedView';
 import { ThemedText } from './ThemedText';
 import { Ionicons } from '@expo/vector-icons';
+import { AVATAR_URLS, COMMON_COLORS, TYPOGRAPHY, SPACING, AVATAR_SIZES } from '@/constants/CommonConstants';
+import { formatTime, extractUsernameFromEmail } from '@/utils/formatters';
 
 interface CommentItemProps {
   comment: {
@@ -25,27 +27,35 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
   return (
     <ThemedView style={styles.commentContainer}>
       <Image 
-        source={{ uri: 'https://w7.pngwing.com/pngs/177/551/png-transparent-user-interface-design-computer-icons-default-stephen-salazar-graphy-user-interface-design-computer-wallpaper-sphere-thumbnail.png' }} 
+        source={{ uri: AVATAR_URLS.COMMENT_PLACEHOLDER }} 
         style={styles.profilePicture} 
+        accessible={true}
+        accessibilityLabel={`Profile picture of ${userName}`}
       />
       <ThemedView style={styles.commentContent}>
         <ThemedView style={styles.header}>
           <ThemedText style={styles.userName}>{userName}</ThemedText>
-          <ThemedText style={styles.userHandle}>@{userEmail.split('@')[0]}</ThemedText>
-          <ThemedText style={styles.timestamp}>{new Date(comment?.createdAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</ThemedText>
+          <ThemedText style={styles.userHandle}>@{extractUsernameFromEmail(userEmail)}</ThemedText>
+          <ThemedText style={styles.timestamp}>{formatTime(comment?.createdAt)}</ThemedText>
         </ThemedView>
-        <ThemedText style={styles.commentText}>{comment?.event.text}</ThemedText>
+        <ThemedText 
+          style={styles.commentText}
+          accessible={true}
+          accessibilityLabel={`Comment by ${userName}: ${comment?.event.text}`}
+        >
+          {comment?.event.text}
+        </ThemedText>
         <ThemedView style={styles.engagementRow}>
           <View style={styles.engagementItem}>
-            <Ionicons name="chatbubble-outline" size={16} color="#6e767d" />
+            <Ionicons name="chatbubble-outline" size={16} color={COMMON_COLORS.ENGAGEMENT_TEXT} />
             <ThemedText style={styles.engagementText}>19</ThemedText>
           </View>
           <View style={styles.engagementItem}>
-            <Ionicons name="heart-outline" size={16} color="#6e767d" />
+            <Ionicons name="heart-outline" size={16} color={COMMON_COLORS.ENGAGEMENT_TEXT} />
             <ThemedText style={styles.engagementText}>1K</ThemedText>
           </View>
           <View style={styles.engagementItem}>
-            <Ionicons name="repeat" size={16} color="#6e767d" />
+            <Ionicons name="repeat" size={16} color={COMMON_COLORS.ENGAGEMENT_TEXT} />
             <ThemedText style={styles.engagementText}>3.4K</ThemedText>
           </View>
         </ThemedView>
@@ -58,16 +68,16 @@ const styles = StyleSheet.create({
   commentContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 20,
+    marginBottom: SPACING.XLARGE,
     borderBottomWidth: 0.3,
-    borderBottomColor: 'gray',
+    borderBottomColor: COMMON_COLORS.BORDER_GRAY,
     paddingBottom: 15,
   },
   profilePicture: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    marginRight: 10,
+    width: AVATAR_SIZES.MEDIUM,
+    height: AVATAR_SIZES.MEDIUM,
+    borderRadius: AVATAR_SIZES.MEDIUM / 2,
+    marginRight: SPACING.MEDIUM,
   },
   commentContent: {
     flex: 1,
@@ -78,18 +88,18 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontWeight: 'bold',
-    marginRight: 5,
+    marginRight: SPACING.SMALL,
   },
   userHandle: {
-    color: '#6e767d',
-    marginRight: 5,
+    color: COMMON_COLORS.ENGAGEMENT_TEXT,
+    marginRight: SPACING.SMALL,
   },
   timestamp: {
-    color: '#6e767d',
+    color: COMMON_COLORS.ENGAGEMENT_TEXT,
   },
   commentText: {
-    marginTop: 5,
-    marginBottom: 10,
+    marginTop: SPACING.SMALL,
+    marginBottom: SPACING.MEDIUM,
     lineHeight: 20,
   },
   engagementRow: {
@@ -102,8 +112,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   engagementText: {
-    marginLeft: 5,
-    color: '#6e767d',
+    marginLeft: SPACING.SMALL,
+    color: COMMON_COLORS.ENGAGEMENT_TEXT,
   },
 });
 

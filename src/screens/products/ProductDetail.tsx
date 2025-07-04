@@ -20,7 +20,7 @@ const ProductDetail = () => {
 
   
   const commentOnProduct = useProductStore((state) => state.commentOnProduct);
-  const fetchCommentsOfProudct = useProductStore((state) => state.fetchCommentsOfProudct);
+  const fetchCommentsOfProduct = useProductStore((state) => state.fetchCommentsOfProduct);
   const comments = useProductStore((state) => state.comments);
 
   try {
@@ -69,8 +69,8 @@ const ProductDetail = () => {
         title: `${parsedProduct?.product_brand} Ürün Detayı`,
       });
     }
-    fetchCommentsOfProudct(parsedProduct!._id);
-  }, [fetchCommentsOfProudct]);
+    fetchCommentsOfProduct(parsedProduct!._id);
+  }, [fetchCommentsOfProduct]);
 
 
   return (
