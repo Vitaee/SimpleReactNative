@@ -8,9 +8,12 @@ import { useLocalSearchParams } from 'expo-router';
 const WebViewScreen = () => {
   const { url } = useLocalSearchParams();
   
+  // Ensure url is a string and not an array
+  const urlString = Array.isArray(url) ? url[0] : url;
+  
   return (
     <View style={styles.container}>
-      <WebView source={{ uri: url }} />
+      <WebView source={{ uri: urlString }} />
     </View>
   );
 };

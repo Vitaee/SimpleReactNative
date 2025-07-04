@@ -1,4 +1,4 @@
-// components/ImageGallery.js
+// components/ImageGallery.tsx
 import React, { useState } from 'react';
 import { View, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import Swiper from 'react-native-swiper';
@@ -6,11 +6,15 @@ import FullScreenImageModal from './ImageModal'; // Import the modal component
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-const ImageGallery = ({ images }) => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
+interface ImageGalleryProps {
+  images: string[];
+}
 
-  const openModal = (imageUri) => {
+const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const openModal = (imageUri: string) => {
     setSelectedImage(imageUri);
     setIsModalVisible(true);
   };

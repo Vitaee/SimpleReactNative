@@ -7,6 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { useRouter } from 'expo-router';
 import { useBrandStore } from '../context/main/BrandsStore'; // Adjust the path as necessary
 import { PRODUCT_SCREEN } from '@/constants/Routes';
+import { TYPOGRAPHY, SPACING, AVATAR_SIZES } from '@/constants/CommonConstants';
 
 
 export default function MainScreen() {
@@ -101,49 +102,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profilePic: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
+    width: AVATAR_SIZES.SMALL,
+    height: AVATAR_SIZES.SMALL,
+    borderRadius: AVATAR_SIZES.SMALL / 2,
+    marginRight: SPACING.MEDIUM,
   },
   greeting: {
-    fontSize: 14,
+    fontSize: TYPOGRAPHY.SMALL_TEXT,
   },
   username: {
-    fontSize: 16,
+    fontSize: TYPOGRAPHY.MEDIUM_TEXT,
     fontWeight: 'bold',
   },
   content: {
     flex: 1,
   },
   promoCard: {
-    margin: 16,
-    padding: 16,
+    margin: SPACING.LARGE,
+    padding: SPACING.LARGE,
     borderRadius: 8,
   },
   promoText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: TYPOGRAPHY.MEDIUM_TEXT,
   },
   bannerScroll: {
-    paddingLeft: 16,
+    paddingLeft: SPACING.LARGE,
   },
   bannerCard: {
     width: 280,
     height: 150,
-    marginRight: 16,
+    marginRight: SPACING.LARGE,
     borderRadius: 8,
-    padding: 16,
+    padding: SPACING.LARGE,
     justifyContent: 'center',
   },
   bannerTitle: {
     color: 'white',
-    fontSize: 18,
+    fontSize: TYPOGRAPHY.LARGE_TEXT,
     fontWeight: 'bold',
   },
   bannerSubtitle: {
     color: 'white',
-    fontSize: 14,
+    fontSize: TYPOGRAPHY.SMALL_TEXT,
   },
   bannerDiscount: {
     color: 'white',
@@ -152,43 +153,43 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: TYPOGRAPHY.LARGE_TEXT,
     fontWeight: 'bold',
-    marginLeft: 16,
+    marginLeft: SPACING.LARGE,
     marginTop: 24,
   },
   sectionSubtitle: {
-    fontSize: 14,
-    marginLeft: 16,
-    marginBottom: 16,
+    fontSize: TYPOGRAPHY.SMALL_TEXT,
+    marginLeft: SPACING.LARGE,
+    marginBottom: SPACING.LARGE,
   },
   brandList: {
-    paddingHorizontal: 16,
+    paddingHorizontal: SPACING.LARGE,
   },
   brandCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: SPACING.LARGE,
     borderRadius: 8,
-    marginBottom: 12,
+    marginBottom: SPACING.MEDIUM,
     borderWidth: 1,
   },
   brandLogo: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
+    width: AVATAR_SIZES.SMALL,
+    height: AVATAR_SIZES.SMALL,
+    borderRadius: AVATAR_SIZES.SMALL / 2,
+    marginRight: SPACING.MEDIUM,
   },
   brandName: {
-    fontSize: 16,
+    fontSize: TYPOGRAPHY.MEDIUM_TEXT,
     fontWeight: 'bold',
     flex: 1,
   },
   brandDiscount: {
-    fontSize: 14,
+    fontSize: TYPOGRAPHY.SMALL_TEXT,
   },
   viewAll: {
-    fontSize: 14,
+    fontSize: TYPOGRAPHY.SMALL_TEXT,
     color: '#6b46c1',
   },
 });
