@@ -15,20 +15,20 @@ interface Filters {
 interface ProductState {
     products: Product[];
     loading: boolean;
-    error: Error | null | unknown;
+    error: string | null;
     pagination: Pagination | null;
     searchProducts: Product[];
     searchLoading: boolean;
-    searchError: Error | null | unknown;
+    searchError: string | null;
     searchPagination: Pagination | null;
     categories: ProductCategory[];
     categoriesLoading: boolean;
-    categoriesError: Error | null | unknown;
+    categoriesError: string | null;
     fetchProducts: (pageNumber: number, brandId?: string, selectedCategory?: string) => Promise<void>;
     fetchSearchProducts: (searchQuery: string, pageNumber: number, brandId?: string) => Promise<void>;
     fetchCategories: (brandId?: string) => Promise<void>;
     commentOnProduct: (productId: string, comment: string) => Promise<void>;
-    fetchCommentsOfProudct: (productId: string) => Promise<void>;
+    fetchCommentsOfProduct: (productId: string) => Promise<void>;
     likeOrUnlikeProduct: (productId: string, timelineEvent?: string) => Promise<void>;
     isProductLiked: (productId: string) => boolean;
     likedProducts: { [key: string]: boolean };
@@ -83,7 +83,7 @@ interface ProductState {
         }));
       } catch (err) {
         console.error('Error fetching products:', err);
-        set({ loading: false, error: err!.toString() });
+        set({ loading: false, error: err instanceof Error ? err.message : 'An unknown error occurred' });
       }
     },
   
@@ -106,8 +106,7 @@ interface ProductState {
         }));
       } catch (err) {
         console.error('Error searching products:', err);
-        
-        set({ searchLoading: false, searchError: err!.toString() });
+        set({ searchLoading: false, searchError: err instanceof Error ? err.message : 'An unknown error occurred' });
       }
     },
 
@@ -124,7 +123,7 @@ interface ProductState {
         }));
       } catch (err) {
         console.error('Error applying filters:', err);
-        set({ searchLoading: false, searchError: err!.toString() });
+        set({ searchLoading: false, searchError: err instanceof Error ? err.message : 'An unknown error occurred' });
       }
     },
   
@@ -138,7 +137,7 @@ interface ProductState {
         });
       } catch (err) {
         console.error('Error fetching categories:', err);
-        set({ categoriesLoading: false, categoriesError: err!.toString() });
+        set({ categoriesLoading: false, categoriesError: err instanceof Error ? err.message : 'An unknown error occurred' });
       }
     },
 
@@ -147,14 +146,14 @@ interface ProductState {
         const response = await api.put('product/event/',  { product_id: productId, text: comment } );
 
         if ( response.status === 200 ) { 
-          await get().fetchCommentsOfProudct(productId);
+          await get().fetchCommentsOfProduct(productId);
         }
       } catch (err) {
         console.error('Error commenting on product:', err);
       }
     },
 
-    fetchCommentsOfProudct: async (productId: string) => {
+    fetchCommentsOfProduct: async (productId: string) => {
       try {
         const response = await api.get(`product/event/comment/${productId}/`);
         set({ comments: response.data.data[0].events });

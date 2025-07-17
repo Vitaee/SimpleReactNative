@@ -18,7 +18,7 @@ import { Colors } from '@/constants/Colors'; // Adjust based on where your theme
 interface FilterModalProps {
   visible: boolean;
   onClose: () => void;
-  onApply: (filters: any) => void;
+  onApply: (filters: Filters) => void;
 }
 
 interface Filters {

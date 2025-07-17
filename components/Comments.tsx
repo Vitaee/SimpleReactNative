@@ -4,8 +4,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from './ThemedView';
 
+interface CommentSectionProps {
+  onCommentSubmit: (comment: string) => void;
+  commentCount?: number;
+}
 
-const CommentSection = ({ onCommentSubmit }) => {
+const CommentSection: React.FC<CommentSectionProps> = ({ onCommentSubmit, commentCount }) => {
   const [comment, setComment] = useState('');
   const [isInputFocused, setInputFocused] = useState(false);
 

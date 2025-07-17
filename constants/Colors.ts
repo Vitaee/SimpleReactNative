@@ -18,7 +18,9 @@ export const Colors = {
     secondaryText: '#666666', 
     accentColor: '#FF6B6B', 
     background: '#FFFFFF', 
-    borderColor: '#E0E0E0', 
+    borderColor: '#E0E0E0',
+    tint: '#0a7ea4',
+    icon: '#687076',
     ...commonColor,
   },
   dark: {
@@ -27,7 +29,9 @@ export const Colors = {
     secondaryText: '#B0B0B0', 
     accentColor: '#FF6B6B', 
     background: '#121212', 
-    borderColor: '#222121', 
+    borderColor: '#222121',
+    tint: '#fff',
+    icon: '#9BA1A6',
     ...commonColor,
   },
 };

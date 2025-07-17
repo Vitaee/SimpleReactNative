@@ -8,6 +8,8 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 import { TimelineData, TimelineEvent } from '@/constants/TimelineType';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import Comments from '@/components/Comments';
+import { AVATAR_URLS, COMMON_COLORS, TYPOGRAPHY, SPACING, AVATAR_SIZES } from '@/constants/CommonConstants';
+import { formatDateTime, isNotEmpty } from '@/utils/formatters';
 
 const TimelineDetailScreen = () => {
   const { data } = useLocalSearchParams();
@@ -17,22 +19,14 @@ const TimelineDetailScreen = () => {
   let parsedData: TimelineData | null = null;
   if (data) {
     try {
-      parsedData = JSON.parse(data) as TimelineData;
+      const dataString = Array.isArray(data) ? data[0] : data;
+      parsedData = JSON.parse(dataString) as TimelineData;
     } catch (error) {
       console.error("Failed to parse data:", error);
     }
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-  
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
-  };
+  const formatDate = formatDateTime;
 
   return (
     <KeyboardAvoidingView
@@ -45,7 +39,12 @@ const TimelineDetailScreen = () => {
 
           
         <ThemedView style={styles.userContainer}>
-            <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/2202/2202112.png' }} style={styles.userAvatar} />
+            <Image 
+              source={{ uri: AVATAR_URLS.PROFILE_PLACEHOLDER }} 
+              style={styles.userAvatar} 
+              accessible={true}
+              accessibilityLabel={`Profile picture of ${parsedData?.user.email}`}
+            />
             <ThemedView style={styles.userInfo}>
               <ThemedText style={styles.userName}>{parsedData?.user.email}</ThemedText>
               
@@ -57,21 +56,26 @@ const TimelineDetailScreen = () => {
           <ThemedText type="title" style={styles.productName}>{parsedData!.title}</ThemedText>
 
           <ThemedText style={styles.productDescription}>{parsedData!.description}</ThemedText>
-          <Image source={{ uri: parsedData!.image[0] }} style={styles.productImage} />
+          <Image 
+            source={{ uri: parsedData!.image[0] }} 
+            style={styles.productImage} 
+            accessible={true}
+            accessibilityLabel={`Product image for ${parsedData!.title}`}
+          />
 
         
           <Comments commentCount={1} onCommentSubmit={() => {}} />
 
           <ThemedText style={styles.commentSectionTitle}>Yorumlar ( {parsedData!.comment_count} ) adet</ThemedText>
           {parsedData!.events && parsedData!.events.map((comment: TimelineEvent, index: number) => (
-            comment.event.text != null && comment.event.text != "" ?
+            isNotEmpty(comment.event.text) ?
             <ThemedView key={index} style={styles.commentContainer}>
-              <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }} style={styles.commentAvatar} />
+              <Image source={{ uri: AVATAR_URLS.DEFAULT_USER }} style={styles.commentAvatar} />
               <ThemedView style={styles.commentContent}>
                 <ThemedText style={styles.commentUserName}>{comment.event.user.email}</ThemedText>
                 <ThemedText style={styles.commentDate}>{formatDate(comment.createdAt)}</ThemedText>
 
-                <ThemedText style={styles.commentText}>Test yorum</ThemedText>
+                <ThemedText style={styles.commentText}>{comment.event.text}</ThemedText>
                 
               </ThemedView>
             </ThemedView>
@@ -88,54 +92,54 @@ const TimelineDetailScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: SPACING.LARGE,
+    paddingTop: SPACING.LARGE,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: SPACING.XLARGE,
   },
   title: {
-    fontSize: 20,
-    marginLeft: 10,
+    fontSize: TYPOGRAPHY.LARGE_TEXT,
+    marginLeft: SPACING.MEDIUM,
   },
   productName: {
-    fontSize: 22,
+    fontSize: TYPOGRAPHY.TITLE_SIZE,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: SPACING.MEDIUM,
   },
   productDescription: {
-    fontSize: 16,
-    marginBottom: 20,
+    fontSize: TYPOGRAPHY.MEDIUM_TEXT,
+    marginBottom: SPACING.XLARGE,
   },
   tags: {
     flexDirection: 'row',
-    marginBottom: 20,
+    marginBottom: SPACING.XLARGE,
   },
   tag: {
-    fontSize: 16,
-    backgroundColor: '#6B6767',
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    fontSize: TYPOGRAPHY.MEDIUM_TEXT,
+    backgroundColor: COMMON_COLORS.TAG_BACKGROUND,
+    borderRadius: SPACING.MEDIUM,
+    paddingHorizontal: SPACING.MEDIUM,
+    paddingVertical: SPACING.SMALL,
   },
   userContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: SPACING.XLARGE,
   },
   userAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: AVATAR_SIZES.SMALL,
+    height: AVATAR_SIZES.SMALL,
+    borderRadius: AVATAR_SIZES.SMALL / 2,
   },
   userInfo: {
-    marginLeft: 10,
+    marginLeft: SPACING.MEDIUM,
     flex: 1,
   },
   userName: {
-    fontSize: 16,
+    fontSize: TYPOGRAPHY.MEDIUM_TEXT,
     fontWeight: 'bold',
   },
   userRating: {
@@ -143,82 +147,82 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   userRatingText: {
-    marginLeft: 5,
+    marginLeft: SPACING.SMALL,
   },
   postDate: {
-    fontSize: 14,
-    color: '#757575',
+    fontSize: TYPOGRAPHY.SMALL_TEXT,
+    color: COMMON_COLORS.MUTED_TEXT,
   },
   productCard: {
     flexDirection: 'row',
     borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 20,
+    borderRadius: SPACING.MEDIUM,
+    padding: SPACING.MEDIUM,
+    marginBottom: SPACING.XLARGE,
   },
   productImage: {
     width: 340,
     height: 340,
-    borderRadius: 10,
+    borderRadius: SPACING.MEDIUM,
   },
   productDetails: {
-    marginLeft: 10,
+    marginLeft: SPACING.MEDIUM,
     flex: 1,
   },
   productTitle: {
-    fontSize: 16,
+    fontSize: TYPOGRAPHY.MEDIUM_TEXT,
     fontWeight: 'bold',
   },
   productSubtitle: {
-    fontSize: 14,
-    marginVertical: 5,
+    fontSize: TYPOGRAPHY.SMALL_TEXT,
+    marginVertical: SPACING.SMALL,
   },
   productRating: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   productRatingText: {
-    marginLeft: 5,
+    marginLeft: SPACING.SMALL,
   },
   commentSectionTitle: {
-    fontSize: 18,
+    fontSize: TYPOGRAPHY.LARGE_TEXT,
     fontWeight: 'bold',
-    marginBottom: 10,
-    marginTop: 18
+    marginBottom: SPACING.MEDIUM,
+    marginTop: TYPOGRAPHY.LARGE_TEXT,
   },
   commentContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 20,
+    marginBottom: SPACING.XLARGE,
   },
   commentAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: AVATAR_SIZES.SMALL,
+    height: AVATAR_SIZES.SMALL,
+    borderRadius: AVATAR_SIZES.SMALL / 2,
   },
   commentContent: {
-    marginLeft: 10,
+    marginLeft: SPACING.MEDIUM,
     flex: 1,
   },
   commentUserName: {
-    fontSize: 14,
+    fontSize: TYPOGRAPHY.SMALL_TEXT,
     fontWeight: 'bold',
   },
   commentText: {
-    fontSize: 14,
-    marginVertical: 5,
+    fontSize: TYPOGRAPHY.SMALL_TEXT,
+    marginVertical: SPACING.SMALL,
   },
   commentRating: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   commentRatingText: {
-    marginLeft: 5,
+    marginLeft: SPACING.SMALL,
   },
   commentDate: {
-    fontSize: 12,
-    color: '#757575',
-    marginTop: 5,
+    fontSize: TYPOGRAPHY.TINY_TEXT,
+    color: COMMON_COLORS.MUTED_TEXT,
+    marginTop: SPACING.SMALL,
   },
 });
 
